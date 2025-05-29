@@ -45,4 +45,8 @@ public class UserController {
         return userService.updateUser(id ,userUpdateRequest.getFirstName() , userUpdateRequest.getLastName() ,
                                       userUpdateRequest.getDcb() , userUpdateRequest.getPassword());
     }
+    @DeleteMapping("/{id}")
+    void deleteUser(@PathVariable String id) {
+        userService.deleteUser(id);
+    }
 }
