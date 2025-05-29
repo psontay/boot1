@@ -32,21 +32,21 @@ public class UserController {
     List<User> findByFirstNameAndLastName(@RequestParam String firstName, @RequestParam String lastName) {
         return userService.findUserByFirstNameAndLastName(firstName, lastName);
     }
-    @GetMapping("/findById")
-    Optional<User> findById(@RequestParam String id) {
+    @GetMapping("findById/{id}")
+    Optional<User> findById(@PathVariable String id) {
         return userService.findUserById(id);
     }
-    @GetMapping("/findByLastName")
-    List<User> findByLastName(@RequestParam String lastName) {
+    @GetMapping("/findByLastName{lastName}")
+    List<User> findByLastName(@PathVariable String lastName) {
         return userService.findUserByLastName(lastName);
     }
-    @PutMapping ("/{id}")
+    @PutMapping ("updateUser/{id}")
     User updateUser( @PathVariable String id, @RequestBody UserUpdateRequest userUpdateRequest) {
         return userService.updateUser(id ,userUpdateRequest.getFirstName() , userUpdateRequest.getLastName() ,
                                       userUpdateRequest.getDcb() , userUpdateRequest.getPassword());
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("deleteUser/{id}")
     void deleteUser(@PathVariable String id) {
-        userService.deleteUser(id);
+        userService.deleteUserById(id);
     }
 }
