@@ -3,11 +3,19 @@ package com.example.boot1.dto.request;
 import java.time.LocalDate;
 
 public class UserUpdateRequest {
-    private String firstName , lastName , password;
+    private String firstName , lastName , password , email;
     private LocalDate dcb;
 
     public String getFirstName() {
         return firstName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setFirstName(String firstName) {

@@ -27,10 +27,14 @@ public class UserService {
         user.setLastName(request.getLastName());
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
+        user.setEmail(request.getEmail());
         return userRepository.save(user);
     }
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
     public List<User> findUsersByFirstName ( String firstName  ) {
         return userRepository.findByFirstNameContaining(firstName);
@@ -44,10 +48,15 @@ public class UserService {
     public List<User> findUserByLastName(String lastName) {
         return userRepository.findByLastNameContaining(lastName);
     }
-    public User updateUser(String id, String firstName, String lastName, LocalDate dcb, String password) {
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+    public User updateUser(String id, String firstName, String lastName, LocalDate dcb, String password ,
+                           String email) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
+            user.setEmail(email);
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setDcb(dcb);

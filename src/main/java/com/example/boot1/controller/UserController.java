@@ -37,14 +37,23 @@ public class UserController {
     Optional<User> findById(@PathVariable String id) {
         return userService.findUserById(id);
     }
+    @GetMapping("findByUsername/{username}")
+    Optional<User> findByUsername(@PathVariable String username) {
+        return userService.getUserByUsername(username);
+    }
     @GetMapping("/findByLastName/{lastName}")
     List<User> findByLastName(@PathVariable String lastName) {
         return userService.findUserByLastName(lastName);
     }
+    @GetMapping("/findByEmail/{email}")
+    Optional<User> findByEmail ( @PathVariable String email) {
+        return userService.findUserByEmail(email);
+    }
     @PutMapping ("updateUser/{id}")
     User updateUser( @PathVariable String id, @RequestBody UserUpdateRequest userUpdateRequest) {
         return userService.updateUser(id ,userUpdateRequest.getFirstName() , userUpdateRequest.getLastName() ,
-                                      userUpdateRequest.getDcb() , userUpdateRequest.getPassword());
+                                      userUpdateRequest.getDcb() , userUpdateRequest.getPassword() ,
+                                      userUpdateRequest.getEmail());
     }
     @DeleteMapping("deleteUser/{id}")
     void deleteUser(@PathVariable String id) {
