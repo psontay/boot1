@@ -24,8 +24,8 @@ public class UserController {
     List<User> getUsers() {
         return userService.getUsers();
     }
-    @GetMapping("/findByFirstName")
-    List<User> findByFirstName(@RequestParam String firstName) {
+    @GetMapping("/findByFirstName/{firstName}")
+    List<User> findByFirstName(@PathVariable String firstName) {
         return userService.findUsersByFirstName(firstName);
     }
     @GetMapping("/findByFirstNameAndLastName")
@@ -36,7 +36,7 @@ public class UserController {
     Optional<User> findById(@PathVariable String id) {
         return userService.findUserById(id);
     }
-    @GetMapping("/findByLastName{lastName}")
+    @GetMapping("/findByLastName/{lastName}")
     List<User> findByLastName(@PathVariable String lastName) {
         return userService.findUserByLastName(lastName);
     }
