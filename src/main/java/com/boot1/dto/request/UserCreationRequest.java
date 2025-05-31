@@ -24,8 +24,8 @@ public class UserCreationRequest {
     String firstName;
     @NotBlank(message = "Lastname is required")
     String lastName;
-    @PastOrPresent(message = "Dcb must be at present or past")
-    LocalDate dcb;
+    @PastOrPresent(message = "Dob must be at present or past")
+    LocalDate dob;
     @NotBlank(message = "Email is required")
     @Email(message = "Must an email form")
     String email;

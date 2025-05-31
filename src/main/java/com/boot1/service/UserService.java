@@ -2,8 +2,11 @@ package com.boot1.service;
 
 import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
+import com.boot1.dto.request.UserUpdateRequest;
+import com.boot1.dto.response.UserResponse;
 import com.boot1.exception.ApiException;
 import com.boot1.exception.ErrorCode;
+import com.boot1.mapper.UserMapper;
 import com.boot1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -17,18 +20,18 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserMapper userMapper;
     public User createUser(UserCreationRequest request) {
-        User user = new User();
-        if ( userRepository.existsByUsername(request.getUsername())) {
+        if ( userRepository.existsByUsername(request.getUsername()))
             throw new ApiException(ErrorCode.USER_EXISTS);
-        }
-        user.setDcb(request.getDcb());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-        user.setEmail(request.getEmail());
+        User user = userMapper.toUser(request);
         return userRepository.save(user);
+    }
+    public UserResponse findUserById(@NonNull String id) {
+        return userMapper.toUserResponse(userRepository.
+                                                 findById(id).
+                                                 orElseThrow(() -> new RuntimeException("User " + "not " + "found")));
     }
     public List<User> getUsers() {
         return userRepository.findAll();
@@ -42,29 +45,17 @@ public class UserService {
     public List<User> findUserByFirstNameAndLastName(String firstName, String lastName) {
         return userRepository.findByFirstNameAndLastName(firstName, lastName);
     }
-    public Optional<User> findUserById(@NonNull String id) {
-        return userRepository.findById(id);
-    }
+
     public List<User> findUserByLastName(String lastName) {
         return userRepository.findByLastNameContaining(lastName);
     }
     public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-    public User updateUser(String id, String firstName, String lastName, LocalDate dcb, String password ,
-                           String email) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setEmail(email);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setDcb(dcb);
-            user.setPassword(password);
-            return userRepository.save(user);
-        } else {
-            throw new RuntimeException("User with ID " + id + " not found");
-        }
+    public User updateUser(String id, UserUpdateRequest request) {
+        User user = userRepository.findById(id).orElse(null);
+        userMapper.updateUser(user , request);
+        return userRepository.save(user);
     }
     public void deleteUserById(String id) {
         userRepository.deleteById(id);

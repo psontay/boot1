@@ -13,5 +13,5 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
     String firstName , lastName , password , email;
-    LocalDate dcb;
+    LocalDate dob;
 }

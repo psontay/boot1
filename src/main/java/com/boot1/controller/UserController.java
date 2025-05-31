@@ -4,6 +4,7 @@ import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.request.UserUpdateRequest;
 import com.boot1.dto.response.ApiResponse;
+import com.boot1.dto.response.UserResponse;
 import com.boot1.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,10 @@ public class UserController {
         apiResponse.setResult(userService.createUser(request));
         return apiResponse;
     }
+    @GetMapping("findById/{id}")
+    UserResponse findById(@PathVariable String id) {
+        return userService.findUserById(id);
+    }
     @GetMapping("/list")
     List<User> getUsers() {
         return userService.getUsers();
@@ -35,10 +40,6 @@ public class UserController {
     @GetMapping("/findByFirstNameAndLastName")
     List<User> findByFirstNameAndLastName(@RequestParam String firstName, @RequestParam String lastName) {
         return userService.findUserByFirstNameAndLastName(firstName, lastName);
-    }
-    @GetMapping("findById/{id}")
-    Optional<User> findById(@PathVariable String id) {
-        return userService.findUserById(id);
     }
     @GetMapping("findByUsername/{username}")
     Optional<User> findByUsername(@PathVariable String username) {
@@ -54,9 +55,7 @@ public class UserController {
     }
     @PutMapping ("updateUser/{id}")
     User updateUser( @PathVariable String id, @RequestBody UserUpdateRequest userUpdateRequest) {
-        return userService.updateUser(id ,userUpdateRequest.getFirstName() , userUpdateRequest.getLastName() ,
-                                      userUpdateRequest.getDcb() , userUpdateRequest.getPassword() ,
-                                      userUpdateRequest.getEmail());
+        return userService.updateUser(id , userUpdateRequest);
     }
     @DeleteMapping("deleteUser/{id}")
     void deleteUser(@PathVariable String id) {
