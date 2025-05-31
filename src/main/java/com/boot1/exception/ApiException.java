@@ -1,4 +1,4 @@
-package com.example.boot1.exception;
+package com.boot1.exception;
 
 public class ApiException extends RuntimeException {
     private final ErrorCode errorCode;

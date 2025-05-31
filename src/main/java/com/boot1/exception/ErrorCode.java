@@ -1,4 +1,4 @@
-package com.example.boot1.exception;
+package com.boot1.exception;
 
 public enum ErrorCode {
     USER_EXISTS(-1,"User already exists"),

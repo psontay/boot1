@@ -1,6 +1,6 @@
-package com.example.boot1.repository;
+package com.boot1.repository;
 
-import com.example.boot1.Entities.User;
+import com.boot1.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

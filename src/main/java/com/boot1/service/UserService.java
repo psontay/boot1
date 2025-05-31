@@ -1,15 +1,13 @@
-package com.example.boot1.service;
+package com.boot1.service;
 
-import com.example.boot1.Entities.User;
-import com.example.boot1.dto.request.UserCreationRequest;
-import com.example.boot1.exception.ApiException;
-import com.example.boot1.exception.ErrorCode;
-import com.example.boot1.repository.UserRepository;
+import com.boot1.Entities.User;
+import com.boot1.dto.request.UserCreationRequest;
+import com.boot1.exception.ApiException;
+import com.boot1.exception.ErrorCode;
+import com.boot1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.method.MethodValidationException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDate;
 import java.util.List;

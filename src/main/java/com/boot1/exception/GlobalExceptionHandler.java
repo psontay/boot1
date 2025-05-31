@@ -1,6 +1,6 @@
-package com.example.boot1.exception;
+package com.boot1.exception;
 
-import com.example.boot1.dto.response.ApiResponse;
+import com.boot1.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;

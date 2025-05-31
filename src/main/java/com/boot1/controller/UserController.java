@@ -1,15 +1,14 @@
-package com.example.boot1.controller;
+package com.boot1.controller;
 
-import com.example.boot1.Entities.User;
-import com.example.boot1.dto.request.UserCreationRequest;
-import com.example.boot1.dto.request.UserUpdateRequest;
-import com.example.boot1.dto.response.ApiResponse;
-import com.example.boot1.service.UserService;
+import com.boot1.Entities.User;
+import com.boot1.dto.request.UserCreationRequest;
+import com.boot1.dto.request.UserUpdateRequest;
+import com.boot1.dto.response.ApiResponse;
+import com.boot1.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

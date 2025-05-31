@@ -1,27 +1,20 @@
-package com.example.boot1.dto.request;
+package com.boot1.Entities;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
-public class UserCreationRequest {
-    @NotBlank(message = "Username is required")
-    @Size(min = 3 , message = "USERNAME_INVALID")
+@Entity
+@Table(name = "user")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     private String username;
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "PASSWORD_INVALID")
     private String password;
-    @NotBlank(message = "Firstname is required")
     private String firstName;
-    @NotBlank(message = "Lastname is required")
     private String lastName;
-    @PastOrPresent(message = "Dcb must be at present or past")
     private LocalDate dcb;
-    @NotBlank(message = "Email is required")
-    @Email(message = "Must an email form")
     private String email;
 
     public String getEmail() {
@@ -30,6 +23,14 @@ public class UserCreationRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUsername() {
