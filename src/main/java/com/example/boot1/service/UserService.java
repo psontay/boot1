@@ -2,6 +2,8 @@ package com.example.boot1.service;
 
 import com.example.boot1.Entities.User;
 import com.example.boot1.dto.request.UserCreationRequest;
+import com.example.boot1.exception.ApiException;
+import com.example.boot1.exception.ErrorCode;
 import com.example.boot1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -20,7 +22,7 @@ public class UserService {
     public User createUser(UserCreationRequest request) {
         User user = new User();
         if ( userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists ! Please try again");
+            throw new ApiException(ErrorCode.USER_EXISTS);
         }
         user.setDcb(request.getDcb());
         user.setFirstName(request.getFirstName());
