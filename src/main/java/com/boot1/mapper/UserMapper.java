@@ -5,6 +5,7 @@ import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.request.UserUpdateRequest;
 import com.boot1.dto.response.UserResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper( componentModel = "spring")

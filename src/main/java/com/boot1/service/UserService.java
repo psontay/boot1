@@ -8,8 +8,13 @@ import com.boot1.exception.ApiException;
 import com.boot1.exception.ErrorCode;
 import com.boot1.mapper.UserMapper;
 import com.boot1.repository.UserRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,15 +22,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
-    @Autowired
     UserRepository userRepository;
-    @Autowired
     UserMapper userMapper;
     public User createUser(UserCreationRequest request) {
         if ( userRepository.existsByUsername(request.getUsername()))
             throw new ApiException(ErrorCode.USER_EXISTS);
         User user = userMapper.toUser(request);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
     public UserResponse findUserById(@NonNull String id) {

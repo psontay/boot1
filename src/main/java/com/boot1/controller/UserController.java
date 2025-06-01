@@ -61,4 +61,8 @@ public class UserController {
     void deleteUser(@PathVariable String id) {
         userService.deleteUserById(id);
     }
+    @GetMapping("/hi")
+    String hi() {
+        return "Hello World";
+    }
 }
