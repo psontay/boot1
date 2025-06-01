@@ -6,6 +6,7 @@ public enum ErrorCode {
     USERNAME_INVALID(-2 , "Username must be at least 3 characters"),
     PASSWORD_INVALID(-3 , "Pasword must be at least 6 characters"),
     USER_NOT_EXISTS(-4, "User not exists"),
+    UNAUTHENTICATED(-5, "Unauthenticated"),
     ;
 
     private int code;
