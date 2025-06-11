@@ -5,19 +5,27 @@ import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.request.UserUpdateRequest;
 import com.boot1.dto.response.ApiResponse;
 import com.boot1.dto.response.UserResponse;
+import com.boot1.mapper.UserMapper;
 import com.boot1.service.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserMapper userMapper;
+
     @PostMapping("/create")
     ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request) {
         ApiResponse<User> apiResponse = new ApiResponse<>();
@@ -30,8 +38,17 @@ public class UserController {
         return userService.findUserById(id);
     }
     @GetMapping("/list")
-    List<User> getUsers() {
-        return userService.getUsers();
+    ApiResponse<List<UserResponse>> getUsers() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Username : {}" , authentication.getName());
+        authentication.getAuthorities().forEach( grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+        List<UserResponse> responseList = userService.getUsers()
+                .stream()
+                .map(userMapper::toUserResponse)
+                .collect(Collectors.toList());
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(responseList)
+                .build();
     }
     @GetMapping("/findByFirstName/{firstName}")
     List<User> findByFirstName(@PathVariable String firstName) {

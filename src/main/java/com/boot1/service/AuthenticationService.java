@@ -1,5 +1,6 @@
 package com.boot1.service;
 
+import com.boot1.Entities.User;
 import com.boot1.dto.request.AuthenticationRequest;
 import com.boot1.dto.request.IntrospectRequest;
 import com.boot1.dto.response.AuthenticationResponse;
@@ -21,11 +22,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -33,7 +36,7 @@ import java.util.Date;
 public class AuthenticationService {
     UserRepository userRepository;
     @NonFinal
-    @Value("${jwt.signerKey")
+    @Value("${spring.jwt.signerKey}")
     protected String SIGNER_KEY;
     public AuthenticationResponse authenticate(AuthenticationRequest request){
         var user =
@@ -46,15 +49,21 @@ public class AuthenticationService {
             throw new ApiException(ErrorCode.UNAUTHENTICATED);
         }
         // generate token
-        var token = generateToken(request.getUsername());
+        var token = generateToken(user);
         return AuthenticationResponse.builder().token(token).success(true).build();
     }
-    private String generateToken(String username) {
+    private String generateToken(User user) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet =
-                new JWTClaimsSet.Builder().subject(username).issuer("sontaypham").issueTime(new Date()).expirationTime(new Date(
+                new JWTClaimsSet.Builder()
+                        .subject(user.getUsername())
+                        .issuer("sontaypham")
+                        .issueTime(new Date())
+                        .expirationTime(new Date(
                         Instant.now().plus(1 , ChronoUnit.HOURS).toEpochMilli()
-                )).build();
+                ))
+                        .claim("scope" , buildScope(user))
+                        .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject( jwsHeader , payload);
         try {
@@ -71,5 +80,12 @@ public class AuthenticationService {
         Date expirationDate = signedJWT.getJWTClaimsSet().getExpirationTime();
         var verifired = signedJWT.verify(verifier);
         return IntrospectResponse.builder().valid(verifired && expirationDate.after(new Date())).build();
+    }
+    private String buildScope ( User user ) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(role -> stringJoiner.add(role));
+        }
+        return stringJoiner.toString();
     }
 }

@@ -1,13 +1,12 @@
 package com.boot1.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.Set;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,6 +28,7 @@ public class UserCreationRequest {
     @NotBlank(message = "Email is required")
     @Email(message = "Must an email form")
     String email;
-
+    @NotEmpty(message = "Roles is required")
+    Set<String> roles;
 
 }
