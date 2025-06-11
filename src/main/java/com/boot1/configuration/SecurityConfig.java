@@ -1,9 +1,11 @@
 package com.boot1.configuration;
 
 
+import com.boot1.Entities.
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,7 +30,8 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(authorizeRequests ->
                                                    authorizeRequests
                                                            .requestMatchers(HttpMethod.POST , PUBLIC_ENDPOINTS).permitAll()
-                                                           .requestMatchers(HttpMethod.GET , "/boot1/users/list").hasAuthority("ROLE_ADMIN")
+                                                           .requestMatchers(HttpMethod.GET , "/boot1/users/list").hasRole(
+                                                                   Role)
                                                            .anyRequest().authenticated());
         httpSecurity.oauth2ResourceServer( config ->
                                          config.jwt( jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
