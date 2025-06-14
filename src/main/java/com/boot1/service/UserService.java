@@ -29,11 +29,11 @@ import java.util.Optional;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
     public User createUser(UserCreationRequest request) {
         if ( userRepository.existsByUsername(request.getUsername()))
             throw new ApiException(ErrorCode.USER_EXISTS);
         User user = userMapper.toUser(request);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         HashSet<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
