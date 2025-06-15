@@ -42,12 +42,8 @@ public class UserController {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("Username : {}" , authentication.getName());
         authentication.getAuthorities().forEach( grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-        List<UserResponse> responseList = userService.getUsers()
-                .stream()
-                .map(userMapper::toUserResponse)
-                .collect(Collectors.toList());
         return ApiResponse.<List<UserResponse>>builder()
-                .result(responseList)
+                .result(userService.getUsers())
                 .build();
     }
     @GetMapping("/findByFirstName/{firstName}")
@@ -77,6 +73,12 @@ public class UserController {
     @DeleteMapping("deleteUser/{id}")
     void deleteUser(@PathVariable String id) {
         userService.deleteUserById(id);
+    }
+    @GetMapping("/myi4")
+    ApiResponse<UserResponse> getMyI4() {
+        return ApiResponse.<UserResponse>builder()
+                          .result(userService.getMyI4())
+                          .build();
     }
     @GetMapping("/hi")
     String hi() {

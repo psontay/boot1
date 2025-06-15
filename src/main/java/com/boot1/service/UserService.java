@@ -12,8 +12,13 @@ import com.boot1.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +31,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@EnableMethodSecurity
+@Slf4j
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
@@ -40,13 +47,26 @@ public class UserService {
         user.setRoles(roles);
         return userRepository.save(user);
     }
+    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse findUserById(@NonNull String id) {
+        log.info("Find user by id: {}", id);
         return userMapper.toUserResponse(userRepository.
                                                  findById(id).
                                                  orElseThrow(() -> new RuntimeException("User " + "not " + "found")));
     }
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> getUsers() {
+        log.info("method getUser");
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toUserResponse).toList();
+    }
+    public UserResponse getMyI4 ( ) {
+        var contextHolder = SecurityContextHolder.getContext();
+        String name = contextHolder.getAuthentication().getName();
+        User byUsername =
+                userRepository.findByUsername(name).orElseThrow( () -> new ApiException(ErrorCode.USER_NOT_EXISTS));
+        return userMapper.toUserResponse(byUsername);
     }
     public Optional<User> getUserByUsername(String username) {
         return userRepository.findByUsername(username);

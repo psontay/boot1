@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException e) {
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.UNCATEGORIZED.getCode());
