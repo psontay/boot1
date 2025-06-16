@@ -92,6 +92,7 @@ public class UserService {
         userMapper.updateUser(user , request);
         return userRepository.save(user);
     }
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public void deleteUserById(String id) {
         userRepository.deleteById(id);
     }
