@@ -82,6 +82,6 @@ public class UserController {
     }
     @GetMapping("/hi")
     String hi() {
-        return "Hello World";
+        return "sontaypham";
     }
 }

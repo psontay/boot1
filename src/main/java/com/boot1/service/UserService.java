@@ -18,6 +18,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,11 +64,12 @@ public class UserService {
                 .map(userMapper::toUserResponse).toList();
     }
     public UserResponse getMyI4 ( ) {
-        var contextHolder = SecurityContextHolder.getContext();
-        String name = contextHolder.getAuthentication().getName();
-        User byUsername =
-                userRepository.findByUsername(name).orElseThrow( () -> new ApiException(ErrorCode.USER_NOT_EXISTS));
-        return userMapper.toUserResponse(byUsername);
+        SecurityContext contextHolder = SecurityContextHolder.getContext();
+        Authentication authentication = contextHolder.getAuthentication();
+        String userName = authentication.getName();
+        User existsUser =
+                userRepository.findByUsername(userName).orElseThrow( () -> new ApiException(ErrorCode.USER_NOT_EXISTS));
+        return userMapper.toUserResponse(existsUser);
     }
     public Optional<User> getUserByUsername(String username) {
         return userRepository.findByUsername(username);
