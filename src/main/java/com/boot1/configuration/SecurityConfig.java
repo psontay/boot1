@@ -41,7 +41,9 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer( config ->
                                          config.jwt( jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
                                                  .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                                                 .authenticationEntryPoint( new JWTAuthenticationEntryPoint()));
+                                                 .authenticationEntryPoint( new JWTAuthenticationEntryPoint())
+                                                 .accessDeniedHandler(new CustomAccessDeniedHandler())
+                                         );
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
