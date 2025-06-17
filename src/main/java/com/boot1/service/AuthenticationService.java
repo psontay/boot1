@@ -7,6 +7,7 @@ import com.boot1.dto.response.AuthenticationResponse;
 import com.boot1.dto.response.IntrospectResponse;
 import com.boot1.exception.ApiException;
 import com.boot1.exception.ErrorCode;
+import com.boot1.repository.RoleRepository;
 import com.boot1.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -29,12 +30,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
-
+import com.boot1.repository.RoleRepository;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class AuthenticationService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     @NonFinal
     @Value("${spring.jwt.signerKey}")
     protected String SIGNER_KEY;
@@ -84,7 +86,7 @@ public class AuthenticationService {
     private String buildScope ( User user ) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(role -> stringJoiner.add(role));
+            user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
         }
         return stringJoiner.toString();
     }

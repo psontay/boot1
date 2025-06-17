@@ -1,6 +1,6 @@
 package com.boot1.enums;
 
-public enum Role {
+public enum RoleName {
     ADMIN,
     USER
 }

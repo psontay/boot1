@@ -14,6 +14,7 @@ public enum ErrorCode {
     USER_NOT_EXISTS(-4, "User not exists" , HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(-5, "Unauthenticated" , HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(-6 , "MAY DEO DUOC PHEP VAO!" , HttpStatus.FORBIDDEN),
+    ROLE_NOT_FOUND(-7 , "Role not found" , HttpStatus.NOT_FOUND),
     ;
 
     private int code;

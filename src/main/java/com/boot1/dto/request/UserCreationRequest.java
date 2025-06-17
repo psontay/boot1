@@ -1,5 +1,6 @@
 package com.boot1.dto.request;
 
+import com.boot1.Entities.Role;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,5 @@ public class UserCreationRequest {
     @Email(message = "Must an email form")
     String email;
     @NotEmpty(message = "Roles is required")
-    Set<String> roles;
-
+    Set<Role> roles;
 }

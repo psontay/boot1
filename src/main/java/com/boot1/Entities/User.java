@@ -24,5 +24,6 @@ public class User {
     String lastName;
     LocalDate dob;
     String email;
+    @ManyToMany(fetch = FetchType.EAGER)
     Set<Role> roles;
 }

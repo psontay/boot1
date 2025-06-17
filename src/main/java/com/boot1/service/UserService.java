@@ -1,19 +1,20 @@
 package com.boot1.service;
 
+import com.boot1.Entities.Role;
 import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.request.UserUpdateRequest;
 import com.boot1.dto.response.UserResponse;
-import com.boot1.enums.Role;
+import com.boot1.enums.RoleName;
 import com.boot1.exception.ApiException;
 import com.boot1.exception.ErrorCode;
 import com.boot1.mapper.UserMapper;
+import com.boot1.repository.RoleRepository;
 import com.boot1.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,14 +22,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +37,7 @@ import java.util.Optional;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     public User createUser(UserCreationRequest request) {
@@ -44,8 +45,10 @@ public class UserService {
             throw new ApiException(ErrorCode.USER_EXISTS);
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
+        Role role = roleRepository.findByName(RoleName.USER)
+                            .orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
         user.setRoles(roles);
         return userRepository.save(user);
     }
