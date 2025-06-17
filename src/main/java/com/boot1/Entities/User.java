@@ -24,5 +24,5 @@ public class User {
     String lastName;
     LocalDate dob;
     String email;
-    Set<String> roles;
+    Set<Role> roles;
 }
