@@ -64,7 +64,7 @@ public class PermissionService {
                 .orElseThrow(() -> new ApiException(ErrorCode.PERMISSION_NOT_FOUND));
     }
     @PreAuthorize("hasRole('ADMIN')")
-    public void updatePermissionByName ( String permissionName, PermissionRequest request) {
+    public PermissionResponse updatePermissionByName ( String permissionName, PermissionRequest request) {
         log.info("method updatePermissionByName");
         Permission permission = permissionRepository
                 .findByName(permissionName)
