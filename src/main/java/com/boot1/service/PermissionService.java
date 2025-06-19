@@ -29,6 +29,9 @@ public class PermissionService {
     PermissionMapper permissionMapper;
     @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse createPermission(PermissionRequest request) {
+        if ( permissionRepository.existsByName(request.getPermissionName())) {
+            throw new ApiException( ErrorCode.PERMISSION_EXISTS );
+        }
         Permission permission = permissionMapper.toPermission(request);
         permission = permissionRepository.save(permission);
         return permissionMapper.toPermissionResponse(permission);
@@ -68,5 +71,19 @@ public class PermissionService {
                 .orElseThrow(() -> new ApiException(ErrorCode.PERMISSION_NOT_FOUND));
         permissionMapper.updatePermissionFromRequest(request, permission);
         permissionRepository.save(permission);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteByName ( String permissionName) {
+        log.info("method deletePermissionByName");
+        Permission permission = permissionRepository.findByName(permissionName)
+                                                            .orElseThrow(() -> new ApiException(ErrorCode.PERMISSION_NOT_FOUND));
+        permissionRepository.delete(permissionName);
+    }
+    public List<PermissionResponse> searchByKeyword(String keyword) {
+        log.info("method searchByKeyword");
+        return permissionRepository.findAllByNameContainingIgnoreCase(keyword)
+                .stream()
+                                   .map(permissionMapper::toPermissionResponse)
+                .collect(Collectors.toList());
     }
 }
