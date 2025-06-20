@@ -28,7 +28,7 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
-                Role adminRole = roleRepository.findByName(RoleName.ADMIN).orElseThrow(() -> new ApiException(
+                Role adminRole = roleRepository.findByName(RoleName.ADMIN.name()).orElseThrow(() -> new ApiException(
                         ErrorCode.ROLE_NOT_FOUND));
                 User user = User.builder()
                         .username("admin")

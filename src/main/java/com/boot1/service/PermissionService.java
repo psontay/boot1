@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class PermissionService {
     PermissionMapper permissionMapper;
     @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse createPermission(PermissionRequest request) {
+        log.info("Create Permission : {}", request.getPermissionName());
         if ( permissionRepository.existsByName(request.getPermissionName())) {
             throw new ApiException( ErrorCode.PERMISSION_EXISTS );
         }
@@ -46,41 +48,44 @@ public class PermissionService {
     }
     @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse findByName(String permissionName) {
-        log.info("method findPermissionByName");
+        log.info("method findPermissionByName : {}", permissionName);
         return permissionRepository.findByName(permissionName)
                 .map(permissionMapper::toPermissionResponse)
                 .orElseThrow(() -> new ApiException(ErrorCode.PERMISSION_NOT_FOUND));
     }
     @PreAuthorize("hasRole('ADMIN')")
     public boolean existsByName ( String permissionName) {
-        log.info("method existsPermissionByPermissionName");
+        log.info("method existsPermissionByPermissionName : {}", permissionName);
         return permissionRepository.existsByName(permissionName);
     }
     @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse findByDescription(String description) {
-        log.info("method findByDescription");
+        log.info("method findByDescription : {}", description);
         return permissionRepository.findByDescription(description)
                 .map(permissionMapper::toPermissionResponse)
                 .orElseThrow(() -> new ApiException(ErrorCode.PERMISSION_NOT_FOUND));
     }
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse updatePermissionByName ( String permissionName, PermissionRequest request) {
-        log.info("method updatePermissionByName");
+        log.info("method updatePermissionByName : {}", permissionName);
         Permission permission = permissionRepository
                 .findByName(permissionName)
                 .orElseThrow(() -> new ApiException(ErrorCode.PERMISSION_NOT_FOUND));
         permissionMapper.updatePermissionFromRequest(request, permission);
         permissionRepository.save(permission);
+        return permissionMapper.toPermissionResponse(permission);
     }
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteByName ( String permissionName) {
-        log.info("method deletePermissionByName");
+    public void deletePermissionByName ( String permissionName) {
+        log.info("method deletePermissionByName : {}", permissionName);
         Permission permission = permissionRepository.findByName(permissionName)
                                                             .orElseThrow(() -> new ApiException(ErrorCode.PERMISSION_NOT_FOUND));
-        permissionRepository.delete(permissionName);
+        permissionRepository.deletePermissionByName(permissionName);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     public List<PermissionResponse> searchByKeyword(String keyword) {
-        log.info("method searchByKeyword");
+        log.info("method searchByKeyword : {}", keyword);
         return permissionRepository.findAllByNameContainingIgnoreCase(keyword)
                 .stream()
                                    .map(permissionMapper::toPermissionResponse)

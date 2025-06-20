@@ -1,8 +1,6 @@
 package com.boot1.Entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,6 +16,13 @@ public class Role {
     @Id
     String name;
     String description;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @ManyToMany
+    @JoinTable(
+            name = "role_permissions",
+            joinColumns = @JoinColumn(name = "role_name"),
+            inverseJoinColumns = @JoinColumn(name = "permission_name")
+    )
     Set<Permission> permissions;
 }

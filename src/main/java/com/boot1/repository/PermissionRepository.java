@@ -14,7 +14,8 @@ public interface PermissionRepository extends JpaRepository<Permission , String>
     boolean existsByName(String permissionName);
     Optional<Permission> findByName(String permissionName);
     Optional<Permission> findByDescription(String permissionDescription);
-    void delete(String permissionName);
+
+    void deletePermissionByName(String name);
 
     List<Permission> findAllByNameContainingIgnoreCase(String keyword );
 }

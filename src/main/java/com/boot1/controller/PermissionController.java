@@ -20,13 +20,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/permission")
+@RequestMapping("/permissions")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionController {
     @Autowired
     PermissionService permissionService;
-    @Autowired
-    PermissionMapper permissionMapper;
     @PostMapping("/create")
     ApiResponse<PermissionResponse> createPermission(@RequestBody @Valid PermissionRequest permissionRequest) {
         return ApiResponse.<PermissionResponse>builder()
@@ -80,8 +78,8 @@ public class PermissionController {
                           .build();
     }
     @DeleteMapping("delete/{name}")
-    ApiResponse<String> deletePermission(@PathVariable String name) {
-        permissionService.deleteByName(name );
+    ApiResponse<String> deletePermissionByName(@PathVariable String name) {
+        permissionService.deletePermissionByName(name);
         return ApiResponse.<String>builder()
                 .code(1)
                 .msg("<Delete Permission Successfully>")
@@ -90,6 +88,16 @@ public class PermissionController {
     }
     @GetMapping("keyword/{keyword}")
     ApiResponse<List<PermissionResponse>> findByKeyword( @PathVariable String keyword) {
-        return ApiResponse.<List<PermissionResponse>>builder().result(permissionService.searchByKeyword(keyword)).build();
+        return ApiResponse.<List<PermissionResponse>>builder()
+                .code(1)
+                .msg("<Find Permission By Keyword Successfully>")
+                .result(permissionService.searchByKeyword(keyword)).build();
     }
+    @GetMapping("/test-scope")
+    public void testScope() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authorities: ");
+        auth.getAuthorities().forEach(a -> System.out.println(a.getAuthority()));
+    }
+
 }
