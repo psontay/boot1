@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,11 +73,12 @@ public class PermissionController {
     ApiResponse<PermissionResponse> updatePermission(@PathVariable String name,
                                     @RequestBody @Valid PermissionRequest permissionRequest) {
         return ApiResponse.<PermissionResponse>builder()
-                .result(permissionService.updatePermissionByName(name , permissionRequest))
+                          .result(permissionService.updatePermissionByName(name , permissionRequest))
                           .code(1)
                           .msg("<Update Permission Successfully>")
                           .build();
     }
+    @Transactional
     @DeleteMapping("delete/{name}")
     ApiResponse<String> deletePermissionByName(@PathVariable String name) {
         permissionService.deletePermissionByName(name);
