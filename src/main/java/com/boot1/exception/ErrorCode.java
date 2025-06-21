@@ -17,6 +17,7 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(-7 , "Role not found" , HttpStatus.NOT_FOUND),
     PERMISSION_NOT_FOUND(-8 , "Permission not found" , HttpStatus.NOT_FOUND),
     PERMISSION_EXISTS(-9 , "Permission already exists" , HttpStatus.CONFLICT),
+    ROLE_EXISTS(-10 , "Role already exists" , HttpStatus.CONFLICT),
     ;
 
     private int code;

@@ -1,0 +1,83 @@
+package com.boot1.service;
+
+import com.boot1.Entities.Role;
+import com.boot1.dto.request.RoleRequest;
+import com.boot1.dto.response.RoleResponse;
+import com.boot1.exception.ApiException;
+import com.boot1.exception.ErrorCode;
+import com.boot1.mapper.RoleMapper;
+import com.boot1.repository.PermissionRepository;
+import com.boot1.repository.RoleRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+@EnableMethodSecurity
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
+public class RoleService {
+    RoleRepository roleRepository;
+    RoleMapper roleMapper;
+    private final PermissionRepository permissionRepository;
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public RoleResponse create( RoleRequest roleRequest) {
+        log.info("<Create Role Method> {}" , roleRequest.getName());
+        if ( roleRepository.existsByName(roleRequest.getName())) {
+            throw new ApiException(ErrorCode.ROLE_EXISTS);
+        }
+        Role role = roleMapper.toRole(roleRequest);
+        role = roleRepository.save(role);
+        return roleMapper.toRoleResponse(role);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public RoleResponse findByName( RoleRequest roleRequest) {
+        log.info("<Find Role Method> {}" , roleRequest.getName());
+        return roleRepository.findByName(roleRequest.getName())
+                .map(roleMapper::toRoleResponse)
+                .orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public boolean existsByName ( RoleRequest roleRequest) {
+        log.info("<Exists Role Method> {}" , roleRequest.getName());
+        return roleRepository.existsByName(roleRequest.getName());
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public RoleResponse findByDescription( RoleRequest roleRequest) {
+        log.info("<Find Role Method> {}" , roleRequest.getName());
+        return roleRepository.findByDescription(roleRequest.getDescription())
+                .map(roleMapper::toRoleResponse)
+                .orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteByName( String roleName) {
+        log.info("<Delete Role Method> {}" , roleName);
+        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
+        roleRepository.deleteByName(roleName);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<RoleResponse> findAllBynameContainningIgnoreCase( String keyWord) {
+        log.info("<Find Role By Keyword Method> {}" , keyWord);
+        return roleRepository.findAllByNameContainingIgnoreCase(keyWord)
+                .stream().map(roleMapper::toRoleResponse)
+                .collect(Collectors.toList());
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public RoleResponse updateFromRequest ( RoleRequest roleRequest) {
+        log.info("<Update Role Method> {}" , roleRequest.getName());
+        Role role = roleRepository.findByName(roleRequest.getName()).orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
+        roleMapper.updateRoleFromRequest(roleRequest , role);
+        roleRepository.save(role);
+        return roleMapper.toRoleResponse(role);
+    }
+}
