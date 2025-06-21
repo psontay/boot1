@@ -60,9 +60,9 @@ public class RoleService {
         return roleRepository.existsByName(roleName);
     }
     @PreAuthorize("hasRole('ADMIN')")
-    public RoleResponse findByDescription( RoleRequest roleRequest) {
-        log.info("<Find Role Method> {}" , roleRequest.getName());
-        return roleRepository.findByDescription(roleRequest.getDescription())
+    public RoleResponse findByDescription( String des) {
+        log.info("<Find Role By Description Method> {}" ,des);
+        return roleRepository.findByDescription(des)
                 .map(roleMapper::toRoleResponse)
                 .orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
     }

@@ -28,7 +28,7 @@ public class RoleController {
                 .result(roleService.create(roleRequest))
                           .build();
     }
-    @PostMapping("/list")
+    @GetMapping("/list")
     public ApiResponse<List<RoleResponse>> getAll() {
         return ApiResponse.<List<RoleResponse>>builder()
                 .code(1)
@@ -52,18 +52,18 @@ public class RoleController {
                 .msg("<Exist Role By Name Success>")
                           .build();
     }
-    @GetMapping("/findByDescription")
-    public ApiResponse<RoleResponse> findByDescription(@RequestBody RoleRequest roleRequest) {
+    @GetMapping("/findByDescription/{des}")
+    public ApiResponse<RoleResponse> findByDescription(@PathVariable String des) {
         return ApiResponse.<RoleResponse>builder()
                 .code(1)
                 .msg("<Find Role By Description Success>")
-                .result(roleService.findByDescription(roleRequest))
+                .result(roleService.findByDescription(des))
                 .build();
     }
     @Transactional
-    @DeleteMapping("/delete")
-    public ApiResponse<String> deleteByName(@RequestBody RoleRequest roleRequest) {
-        roleService.deleteByName(roleRequest.getName());
+    @DeleteMapping("/delete/{name}")
+    public ApiResponse<String> deleteByName(@PathVariable String name) {
+        roleService.deleteByName(name);
         return ApiResponse.<String>builder()
                 .code(1)
                 .msg("<Delete Role Success>")
