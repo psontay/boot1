@@ -1,5 +1,6 @@
 package com.boot1.service;
 
+import com.boot1.Entities.Permission;
 import com.boot1.Entities.Role;
 import com.boot1.dto.request.RoleRequest;
 import com.boot1.dto.response.RoleResponse;
@@ -17,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
 public class RoleService {
     RoleRepository roleRepository;
     RoleMapper roleMapper;
-    private final PermissionRepository permissionRepository;
+    PermissionRepository permissionRepository;
 
     @PreAuthorize("hasRole('ADMIN')")
     public RoleResponse create( RoleRequest roleRequest) {
@@ -36,9 +38,14 @@ public class RoleService {
         if ( roleRepository.existsByName(roleRequest.getName())) {
             throw new ApiException(ErrorCode.ROLE_EXISTS);
         }
+        List<Permission> permission = permissionRepository.findAllById(roleRequest.getPermissions());
         Role role = roleMapper.toRole(roleRequest);
+        role.setPermissions(new HashSet<>(permission));
         role = roleRepository.save(role);
         return roleMapper.toRoleResponse(role);
+    }
+    public List<RoleResponse> getAll() {
+        return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).collect(Collectors.toList());
     }
     @PreAuthorize("hasRole('ADMIN')")
     public RoleResponse findByName( RoleRequest roleRequest) {
@@ -48,9 +55,9 @@ public class RoleService {
                 .orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
     }
     @PreAuthorize("hasRole('ADMIN')")
-    public boolean existsByName ( RoleRequest roleRequest) {
-        log.info("<Exists Role Method> {}" , roleRequest.getName());
-        return roleRepository.existsByName(roleRequest.getName());
+    public boolean existsByName ( String roleName) {
+        log.info("<Exists Role Method> {}" , roleName);
+        return roleRepository.existsByName(roleName);
     }
     @PreAuthorize("hasRole('ADMIN')")
     public RoleResponse findByDescription( RoleRequest roleRequest) {
