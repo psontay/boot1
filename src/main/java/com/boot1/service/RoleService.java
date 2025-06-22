@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -91,5 +92,21 @@ public class RoleService {
         roleMapper.updateRoleFromRequest(roleRequest , role);
         roleRepository.save(role);
         return roleMapper.toRoleResponse(role);
+    }
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public RoleResponse addPermissionsToRole ( String roleName , List<String> permissionNames) {
+        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
+        Set<String> names = new HashSet<>(permissionNames);
+        List<Permission> permissions = permissionRepository.findAllByNameIn(names);
+        if ( permissions.size() != permissionNames.size()) {
+            List<String> foundNames = permissions.stream().map(Permission::getName).collect(Collectors.toList());
+            List<String> missing = permissionNames.stream().filter( p -> !foundNames.contains(p)).collect(Collectors.toList());
+            throw new ApiException(ErrorCode.PERMISSION_NOT_FOUND);
+
+        }
+        role.getPermissions().addAll(permissions);
+        Role save = roleRepository.save(role);
+        return roleMapper.toRoleResponse(save);
     }
 }

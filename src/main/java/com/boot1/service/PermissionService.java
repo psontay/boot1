@@ -3,6 +3,7 @@ package com.boot1.service;
 import com.boot1.Entities.Permission;
 import com.boot1.dto.request.PermissionRequest;
 import com.boot1.dto.response.PermissionResponse;
+import com.boot1.dto.response.RoleResponse;
 import com.boot1.exception.ApiException;
 import com.boot1.exception.ErrorCode;
 import com.boot1.mapper.PermissionMapper;
@@ -91,4 +92,5 @@ public class PermissionService {
                                    .map(permissionMapper::toPermissionResponse)
                 .collect(Collectors.toList());
     }
+
 }
