@@ -87,4 +87,14 @@ public class RoleController {
                           .result(roleService.updateFromRequest(roleRequest))
                           .build();
     }
+    @Transactional
+    @PutMapping("/addPermission/{name}")
+    public ApiResponse<RoleResponse> addPermission(@PathVariable String name ,
+                                                   @RequestBody List<String> permissionsName) {
+        return ApiResponse.<RoleResponse>builder()
+                .code(1)
+                .msg("<Permission Added>")
+                .result(roleService.addPermissionsToRole(name,permissionsName))
+                .build();
+    }
 }
