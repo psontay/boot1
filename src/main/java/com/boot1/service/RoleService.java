@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,9 +39,10 @@ public class RoleService {
         if ( roleRepository.existsByName(roleRequest.getName())) {
             throw new ApiException(ErrorCode.ROLE_EXISTS);
         }
-        List<Permission> permission = permissionRepository.findAllById(roleRequest.getPermissions());
+        Set<String> permissionNames =roleRequest.getPermissions();
+        List<Permission> permissions = permissionRepository.findAllByNameIn(permissionNames);
         Role role = roleMapper.toRole(roleRequest);
-        role.setPermissions(new HashSet<>(permission));
+        role.setPermissions(new HashSet<>(permissions));
         role = roleRepository.save(role);
         return roleMapper.toRoleResponse(role);
     }
@@ -48,9 +50,9 @@ public class RoleService {
         return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).collect(Collectors.toList());
     }
     @PreAuthorize("hasRole('ADMIN')")
-    public RoleResponse findByName( RoleRequest roleRequest) {
-        log.info("<Find Role Method> {}" , roleRequest.getName());
-        return roleRepository.findByName(roleRequest.getName())
+    public RoleResponse findByName( String roleName) {
+        log.info("<Find Role Method> {}" , roleName);
+        return roleRepository.findByName(roleName)
                 .map(roleMapper::toRoleResponse)
                 .orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
     }

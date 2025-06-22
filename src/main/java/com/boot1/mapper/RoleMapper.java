@@ -14,5 +14,6 @@ public interface RoleMapper {
     Role toRole (RoleRequest roleRequest);
     @Mapping( source = "name" , target = "name")
     RoleResponse toRoleResponse (Role role);
-    RoleResponse updateRoleFromRequest( RoleRequest roleRequest , @MappingTarget Role role);
+    @Mapping( target = "permissions" , ignore = true)
+    void updateRoleFromRequest( RoleRequest roleRequest , @MappingTarget Role role);
 }

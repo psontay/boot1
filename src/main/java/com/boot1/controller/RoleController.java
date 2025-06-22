@@ -36,12 +36,12 @@ public class RoleController {
                           .result(roleService.getAll())
                           .build();
     }
-    @PostMapping("/findByName")
-    public ApiResponse<RoleResponse> findByName(@RequestBody RoleRequest roleRequest) {
+    @PostMapping("/findByName/{roleName}")
+    public ApiResponse<RoleResponse> findByName( @PathVariable String roleName) {
         return ApiResponse.<RoleResponse>builder()
                 .code(1)
                 .msg("<Find Role By Name Success>")
-                .result(roleService.findByName(roleRequest))
+                .result(roleService.findByName(roleName))
                 .build();
     }
     @GetMapping("/existsByName/{name}")
@@ -70,12 +70,12 @@ public class RoleController {
                 .result("<Delete Role Success>")
                           .build();
     }
-    @GetMapping("/keyword")
-    public ApiResponse<List<RoleResponse>> findByKeyword(@RequestBody RoleRequest roleRequest) {
+    @GetMapping("/keyword/{keyword}")
+    public ApiResponse<List<RoleResponse>> findByKeyword(@PathVariable String keyword) {
         return ApiResponse.<List<RoleResponse>>builder()
                 .code(1)
                 .msg("<Find By Keyword Success>")
-                .result(roleService.findAllBynameContainningIgnoreCase(roleRequest.getName()))
+                .result(roleService.findAllBynameContainningIgnoreCase(keyword))
                           .build();
     }
     @Transactional
