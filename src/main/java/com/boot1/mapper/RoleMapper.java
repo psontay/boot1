@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper( componentModel = "spring")
+@Mapper( componentModel = "spring" , uses = PermissionMapper.class)
 public interface RoleMapper {
     @Mapping ( source = "name" , target = "name")
     @Mapping( target = "permissions" , ignore = true)
