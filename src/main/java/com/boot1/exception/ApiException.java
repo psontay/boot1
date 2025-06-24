@@ -7,4 +7,8 @@ public class ApiException extends RuntimeException {
         this.errorCode = errorCode;
     }
     public ErrorCode getErrorCode() { return errorCode; }
+    public ApiException(ErrorCode errorCode, String detailMsg) {
+        super(detailMsg);
+        this.errorCode = errorCode;
+    }
 }
