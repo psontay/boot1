@@ -91,8 +91,11 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
     public User updateUser(String id, UserUpdateRequest request) {
-        User user = userRepository.findById(id).orElse(null);
+        User user = userRepository.findById(id).orElseThrow( () -> new ApiException(ErrorCode.USER_NOT_EXISTS));
         userMapper.updateUser(user , request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        var roles = roleRepository.findAllByRole(user.getRoles());
+        user.setRoles(roles);
         return userRepository.save(user);
     }
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
