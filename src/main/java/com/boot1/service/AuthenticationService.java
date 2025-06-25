@@ -26,12 +26,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
+import com.boot1.Entities.Permission;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import com.boot1.repository.RoleRepository;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -70,6 +71,7 @@ public class AuthenticationService {
                         Instant.now().plus(1 , ChronoUnit.HOURS).toEpochMilli()
                 ))
                         .claim("scope" , buildScope(user))
+                        .claim("permission" ,buildPermissions(user))
                         .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject( jwsHeader , payload);
@@ -94,5 +96,15 @@ public class AuthenticationService {
             user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
         }
         return stringJoiner.toString();
+    }
+    private List<String> buildPermissions ( User user )  {
+        if ( CollectionUtils.isEmpty(user.getRoles())) {
+            return Collections.emptyList();
+        }
+        return user.getRoles().stream()
+                   .flatMap(role -> role.getPermissions().stream())
+                .map(Permission::getName)
+                .distinct()
+                .toList();
     }
 }
