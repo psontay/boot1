@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +95,7 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow( () -> new ApiException(ErrorCode.USER_NOT_EXISTS));
         userMapper.updateUser(user , request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        var roles = roleRepository.findAllByRole(user.getRoles());
+        var roles = roleRepository.findByNameIn(request.getRoles());
         user.setRoles(roles);
         return userRepository.save(user);
     }

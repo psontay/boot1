@@ -103,7 +103,6 @@ public class RoleService {
             List<String> foundNames = permissions.stream().map(Permission::getName).collect(Collectors.toList());
             List<String> missing = permissionNames.stream().filter( p -> !foundNames.contains(p)).collect(Collectors.toList());
             throw new ApiException(ErrorCode.PERMISSION_NOT_FOUND , "Missing Permission : " + missing);
-
         }
         role.getPermissions().addAll(permissions);
         Role save = roleRepository.save(role);

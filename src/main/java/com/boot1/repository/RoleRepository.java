@@ -13,6 +13,6 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     boolean existsByName( String roleName);
     Optional<Role> findByDescription(String description);
     void deleteByName( String roleName);
-    Set<Role> findAllByRole(Set<Role> role);
+    Set<Role> findByNameIn(Set<String> names);
     List<Role> findAllByNameContainingIgnoreCase(String keyword);
 }

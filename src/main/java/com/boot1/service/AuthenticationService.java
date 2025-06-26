@@ -40,7 +40,6 @@ import com.boot1.repository.RoleRepository;
 @Slf4j
 public class AuthenticationService {
     UserRepository userRepository;
-    RoleRepository roleRepository;
     @NonFinal
     @Value("${spring.jwt.signerKey}")
     protected String SIGNER_KEY;

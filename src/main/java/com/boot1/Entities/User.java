@@ -1,5 +1,6 @@
 package com.boot1.Entities;
 
+import com.boot1.validator.DobConstraint;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +23,7 @@ public class User {
     String password;
     String firstName;
     String lastName;
+    @DobConstraint(min = 18)
     LocalDate dob;
     String email;
     @ManyToMany(fetch = FetchType.EAGER)
