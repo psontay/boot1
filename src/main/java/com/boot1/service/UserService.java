@@ -11,6 +11,7 @@ import com.boot1.exception.ErrorCode;
 import com.boot1.mapper.UserMapper;
 import com.boot1.repository.RoleRepository;
 import com.boot1.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,9 +42,8 @@ public class UserService {
     RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
-    public User createUser(UserCreationRequest request) {
-        if ( userRepository.existsByUsername(request.getUsername()))
-            throw new ApiException(ErrorCode.USER_EXISTS);
+    public User createUser( UserCreationRequest request) {
+        if ( userRepository.existsByUsername(request.getUsername())) throw new ApiException(ErrorCode.USER_EXISTS);
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role role = roleRepository.findByName(RoleName.USER.name())

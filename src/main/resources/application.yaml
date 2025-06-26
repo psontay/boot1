@@ -17,3 +17,9 @@ spring:
     show-sql: true
   jwt:
     signerKey: "Qc955jB8ZTIYl65VjJtY1LBLmrnie0TWUsg8rrgPPNfA519xN4Dz5peb3RsYF/C4"
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql: TRACE
+      org.springframework.transaction: DEBUG
+      org.hibernate.engine.internal: DEBUG

@@ -23,7 +23,6 @@ public class User {
     String password;
     String firstName;
     String lastName;
-    @DobConstraint(min = 18)
     LocalDate dob;
     String email;
     @ManyToMany(fetch = FetchType.EAGER)

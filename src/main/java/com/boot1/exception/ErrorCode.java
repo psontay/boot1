@@ -19,6 +19,8 @@ public enum ErrorCode {
     PERMISSION_NOT_FOUND(-8 , "Permission not found" , HttpStatus.NOT_FOUND),
     PERMISSION_EXISTS(-9 , "Permission already exists" , HttpStatus.CONFLICT),
     ROLE_EXISTS(-10 , "Role already exists" , HttpStatus.CONFLICT),
+    INVALID_DATE_OF_BIRTH(-11 , "Invalid date of birth" , HttpStatus.BAD_REQUEST),
+    INVALID_ERROR_CODE(-12 , "Invalid error code" , HttpStatus.BAD_REQUEST),
     ;
 
     private int code;

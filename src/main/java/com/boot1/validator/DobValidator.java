@@ -13,12 +13,17 @@ public class DobValidator implements ConstraintValidator<DobConstraint , LocalDa
     public boolean isValid(LocalDate localDate, ConstraintValidatorContext constraintValidatorContext) {
         if (Objects.isNull(localDate)) return true;
         long years = ChronoUnit.YEARS.between(localDate, LocalDate.now());
-        return years >= min;
+        if ( years < min) {
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("User DOB must greater than " + this.min + " age").addConstraintViolation();
+            return false;
+        }
+        return true;
     }
 
     @Override
     public void initialize(DobConstraint constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
-        min = constraintAnnotation.min();
+        this.min = constraintAnnotation.min();
     }
 }

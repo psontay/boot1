@@ -7,6 +7,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -31,18 +34,21 @@ public class GlobalExceptionHandler {
                                                 .build()
                                   );
     }
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse<Void>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        String enumKey = e.getFieldError().getDefaultMessage();
-        ErrorCode errorCode = ErrorCode.valueOf(enumKey);
-        return ResponseEntity.status(errorCode.getStatusCode())
-                             .body(
-                                     ApiResponse.<Void>builder()
-                                             .code(errorCode.getCode())
-                                                .msg(errorCode.getMsg())
-                                                .build()
-                                  );
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(err ->
+                                                               errors.put(err.getField(), err.getDefaultMessage())
+                                                      );
+
+        return ResponseEntity.badRequest()
+                             .body(ApiResponse.<Map<String, String>>builder()
+                                              .code(ErrorCode.INVALID_ERROR_CODE.getCode())
+                                              .msg("Validation failed")
+                                              .result(errors)
+                                              .build());
     }
+
     @ExceptionHandler( value = AccessDeniedException.class)
     ResponseEntity<ApiResponse<Void>> handlingAccessDeniedException() {
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
