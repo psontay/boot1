@@ -1,11 +1,14 @@
 package com.boot1.exception;
 
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
 public enum ErrorCode {
     USER_EXISTS(-1,"User already exists" , HttpStatus.CONFLICT ),
     UNCATEGORIZED_EXCEPTION(-999, "UNCATEGORIZED_ERROR" , HttpStatus.INTERNAL_SERVER_ERROR),
@@ -23,9 +26,9 @@ public enum ErrorCode {
     INVALID_ERROR_CODE(-12 , "Invalid error code" , HttpStatus.BAD_REQUEST),
     ;
 
-    private int code;
-    private String msg;
-    private HttpStatusCode statusCode;
+    int code;
+    String msg;
+    HttpStatusCode statusCode;
     ErrorCode(int code, String msg , HttpStatusCode statusCode) {
         this.code = code;
         this.msg = msg;
