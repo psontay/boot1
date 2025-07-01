@@ -12,8 +12,8 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     USER_EXISTS(-1,"User already exists" , HttpStatus.CONFLICT ),
     UNCATEGORIZED_EXCEPTION(-999, "UNCATEGORIZED_ERROR" , HttpStatus.INTERNAL_SERVER_ERROR),
-    USERNAME_INVALID(-2 , "Username must be at least 3 characters", HttpStatus.BAD_REQUEST),
-    PASSWORD_INVALID(-3 , "Pasword must be at least 6 characters" , HttpStatus.BAD_REQUEST),
+    USERNAME_INVALID(-2 , "Username must be at least {min} characters", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(-3 , "Pasword must be at least {min} characters" , HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTS(-4, "User not exists" , HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(-5, "Unauthenticated" , HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(-6 , "MAY DEO DUOC PHEP VAO!" , HttpStatus.FORBIDDEN),
@@ -22,8 +22,10 @@ public enum ErrorCode {
     PERMISSION_NOT_FOUND(-8 , "Permission not found" , HttpStatus.NOT_FOUND),
     PERMISSION_EXISTS(-9 , "Permission already exists" , HttpStatus.CONFLICT),
     ROLE_EXISTS(-10 , "Role already exists" , HttpStatus.CONFLICT),
-    INVALID_DATE_OF_BIRTH(-11 , "Invalid date of birth" , HttpStatus.BAD_REQUEST),
+    INVALID_DATE_OF_BIRTH(-11 , "Invalid date of birth , must be at least {min} years old" , HttpStatus.BAD_REQUEST),
     INVALID_ERROR_CODE(-12 , "Invalid error code" , HttpStatus.BAD_REQUEST),
+    INVALID_KEY(-13 , "Invalid key" , HttpStatus.BAD_REQUEST),
+    INVALID_EMAIL_TYPE(-14 , "Invalid email type , must start with {domain}" , HttpStatus.BAD_REQUEST),
     ;
 
     int code;

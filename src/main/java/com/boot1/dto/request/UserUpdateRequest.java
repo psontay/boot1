@@ -1,6 +1,8 @@
 package com.boot1.dto.request;
 
 import com.boot1.Entities.Role;
+import com.boot1.validator.DobConstraint;
+import com.boot1.validator.MailConstraint;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,7 +16,10 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
-    String firstName , lastName , password , email;
+    String firstName , lastName , password;
+    @MailConstraint(domain = "user@" , message = "INVALID_EMAIL_TYPE")
+    String email;
+    @DobConstraint( min = 18 , message = "INVALID_DATE_OF_BIRTH")
     LocalDate dob;
     Set<String> roles;
 }

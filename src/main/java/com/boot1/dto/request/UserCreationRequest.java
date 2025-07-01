@@ -2,6 +2,7 @@ package com.boot1.dto.request;
 
 import com.boot1.Entities.Role;
 import com.boot1.validator.DobConstraint;
+import com.boot1.validator.MailConstraint;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,9 +27,9 @@ public class UserCreationRequest {
     @NotBlank(message = "Lastname is required")
     String lastName;
     @DobConstraint(min = 18 , message = "INVALID_DATE_OF_BIRTH")
-    @PastOrPresent(message = "Dob must be at present or past")
     LocalDate dob;
     @NotBlank(message = "Email is required")
     @Email(message = "Must an email form")
+    @MailConstraint(domain = "user@" , message = "INVALID_EMAIL_TYPE")
     String email;
 }

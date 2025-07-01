@@ -1,5 +1,6 @@
 package com.boot1.exception;
 
+
 public class ApiException extends RuntimeException {
     private final ErrorCode errorCode;
     public ApiException(ErrorCode errorCode) {

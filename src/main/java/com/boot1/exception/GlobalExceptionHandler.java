@@ -5,17 +5,17 @@ import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
+    private static final String MIN_ATTRIBUTE = "min" , MAIL_TYPE = "mail";
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handlingRuntimeException() {
         return ResponseEntity.badRequest()
@@ -39,20 +39,27 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler( value = MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(err ->
-                                                               errors.put(err.getField(), err.getDefaultMessage())
-                                                      );
-        BindingResult bindingResult = ex.getBindingResult();
-        var constraintViolations = bindingResult.getFieldErrors().getFirst().unwrap(ConstraintViolation.class);
-        var attributes  = constraintViolations.getConstraintDescriptor().getAttributes();
-        log.warn(attributes.toString());
-        return ResponseEntity.badRequest()
-                             .body(ApiResponse.<Map<String, String>>builder()
-                                              .code(ErrorCode.INVALID_ERROR_CODE.getCode())
-                                              .msg("Validation failed")
-                                              .result(errors)
-                                              .build());
+        String enumKey = ex.getFieldError().getDefaultMessage();
+        ErrorCode errorCode = ErrorCode.valueOf(enumKey);
+        Map<String , Object> attributes = null;
+        try {
+            errorCode = ErrorCode.valueOf(enumKey);
+            var violation = ex.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
+            attributes = violation.getConstraintDescriptor().getAttributes();
+        }catch(IllegalArgumentException e) {
+            log.error(e.getMessage());
+        }
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(
+                        ApiResponse.<Map<String,String>>builder()
+                                .code(errorCode.getCode())
+                                .msg(Objects.nonNull(attributes) ? mapAttributes(errorCode.getMsg() , attributes) : errorCode.getMsg())
+                                   .build()
+                     );
+//        ApiResponse apiResponse = new ApiResponse();
+//        apiResponse.setCode(errorCode.getCode());
+//        apiResponse.setMsg( Objects.nonNull(attributes) ? mapAttributes(errorCode.getMsg() , attributes) : errorCode.getMsg());
+//        return ResponseEntity.badRequest().body(apiResponse);
     }
 
     @ExceptionHandler( value = AccessDeniedException.class)
@@ -65,5 +72,11 @@ public class GlobalExceptionHandler {
                                                     .msg(errorCode.getMsg())
                                                     .build()
                                   );
+    }
+    private String mapAttributes ( String message , Map<String, Object> attributes ) {
+        for ( Map.Entry<String, Object> entry : attributes.entrySet()) {
+            message = message.replace("{" + entry.getKey() + "}", String.valueOf(entry.getValue()));
+        }
+        return message;
     }
 }
