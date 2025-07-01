@@ -12,13 +12,13 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     USER_EXISTS(-1,"User already exists" , HttpStatus.CONFLICT ),
     UNCATEGORIZED_EXCEPTION(-999, "UNCATEGORIZED_ERROR" , HttpStatus.INTERNAL_SERVER_ERROR),
-    USERNAME_INVALID(-2 , "Username must be at least {min} characters", HttpStatus.BAD_REQUEST),
-    PASSWORD_INVALID(-3 , "Pasword must be at least {min} characters" , HttpStatus.BAD_REQUEST),
+    USERNAME_LENGTH_INVALID(-2 , "Username must be at least {min} characters", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(-3 , "Password must be at least {min} characters" , HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTS(-4, "User not exists" , HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(-5, "Unauthenticated" , HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(-6 , "MAY DEO DUOC PHEP VAO!" , HttpStatus.FORBIDDEN),
     ROLE_NOT_FOUND(-7 , "Role not found" , HttpStatus.NOT_FOUND),
-    PERMISSION_IS_EMTPY(-10 , "Permission is emtpy" , HttpStatus.CONFLICT),
+    PERMISSION_IS_EMPTY(-10 , "Permission is empty" , HttpStatus.CONFLICT),
     PERMISSION_NOT_FOUND(-8 , "Permission not found" , HttpStatus.NOT_FOUND),
     PERMISSION_EXISTS(-9 , "Permission already exists" , HttpStatus.CONFLICT),
     ROLE_EXISTS(-10 , "Role already exists" , HttpStatus.CONFLICT),
@@ -26,6 +26,7 @@ public enum ErrorCode {
     INVALID_ERROR_CODE(-12 , "Invalid error code" , HttpStatus.BAD_REQUEST),
     INVALID_KEY(-13 , "Invalid key" , HttpStatus.BAD_REQUEST),
     INVALID_EMAIL_TYPE(-14 , "Invalid email type , must start with {domain} & end with @gmail.com" , HttpStatus.BAD_REQUEST),
+    USERNAME_TYPE_INVALID(-15 , "Username must be at least 1 character upper" , HttpStatus.BAD_REQUEST),
     ;
 
     int code;

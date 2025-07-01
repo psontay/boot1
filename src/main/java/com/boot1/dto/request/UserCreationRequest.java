@@ -1,14 +1,13 @@
 package com.boot1.dto.request;
 
-import com.boot1.Entities.Role;
 import com.boot1.validator.DobConstraint;
 import com.boot1.validator.MailConstraint;
+import com.boot1.validator.UsernameConstraint;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Builder
 @NoArgsConstructor
@@ -18,6 +17,7 @@ import java.util.Set;
 public class UserCreationRequest {
     @NotBlank(message = "Username is required")
     @Size(min = 3 , message = "USERNAME_INVALID")
+    @UsernameConstraint( message = "USERNAME_TYPE_INVALID")
     String username;
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "PASSWORD_INVALID")
