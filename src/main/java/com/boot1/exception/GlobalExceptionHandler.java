@@ -39,7 +39,16 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler( value = MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(MethodArgumentNotValidException ex) {
-        String enumKey = ex.getFieldError().getDefaultMessage();
+        String enumKey = "INVALID_KEY";
+        for (var err : ex.getBindingResult().getAllErrors()) {
+            String key = err.getDefaultMessage();
+            try {
+                ErrorCode.valueOf(key);
+                enumKey = key;
+                break;
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
         ErrorCode errorCode = ErrorCode.valueOf(enumKey);
         Map<String , Object> attributes = null;
         try {
@@ -56,10 +65,6 @@ public class GlobalExceptionHandler {
                                 .msg(Objects.nonNull(attributes) ? mapAttributes(errorCode.getMsg() , attributes) : errorCode.getMsg())
                                    .build()
                      );
-//        ApiResponse apiResponse = new ApiResponse();
-//        apiResponse.setCode(errorCode.getCode());
-//        apiResponse.setMsg( Objects.nonNull(attributes) ? mapAttributes(errorCode.getMsg() , attributes) : errorCode.getMsg());
-//        return ResponseEntity.badRequest().body(apiResponse);
     }
 
     @ExceptionHandler( value = AccessDeniedException.class)

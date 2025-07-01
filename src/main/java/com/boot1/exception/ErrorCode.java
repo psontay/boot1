@@ -25,7 +25,7 @@ public enum ErrorCode {
     INVALID_DATE_OF_BIRTH(-11 , "Invalid date of birth , must be at least {min} years old" , HttpStatus.BAD_REQUEST),
     INVALID_ERROR_CODE(-12 , "Invalid error code" , HttpStatus.BAD_REQUEST),
     INVALID_KEY(-13 , "Invalid key" , HttpStatus.BAD_REQUEST),
-    INVALID_EMAIL_TYPE(-14 , "Invalid email type , must start with {domain}" , HttpStatus.BAD_REQUEST),
+    INVALID_EMAIL_TYPE(-14 , "Invalid email type , must start with {domain} & end with @gmail.com" , HttpStatus.BAD_REQUEST),
     ;
 
     int code;

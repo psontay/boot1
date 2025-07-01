@@ -29,7 +29,6 @@ public class UserCreationRequest {
     @DobConstraint(min = 18 , message = "INVALID_DATE_OF_BIRTH")
     LocalDate dob;
     @NotBlank(message = "Email is required")
-    @Email(message = "Must an email form")
     @MailConstraint(domain = "user@" , message = "INVALID_EMAIL_TYPE")
     String email;
 }
