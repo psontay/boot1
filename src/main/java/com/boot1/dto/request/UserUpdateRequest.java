@@ -1,6 +1,5 @@
 package com.boot1.dto.request;
 
-import com.boot1.Entities.Role;
 import com.boot1.validator.DobConstraint;
 import com.boot1.validator.MailConstraint;
 import lombok.*;

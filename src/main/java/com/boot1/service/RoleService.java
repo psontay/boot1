@@ -43,7 +43,7 @@ public class RoleService {
         Set<String> permissionNames =roleRequest.getPermissions();
         List<Permission> permissions = permissionRepository.findAllByNameIn(permissionNames);
         if ( permissions.isEmpty()) {
-            throw new ApiException(ErrorCode.PERMISSION_IS_EMTPY);
+            throw new ApiException(ErrorCode.PERMISSION_IS_EMPTY);
         }
         Role role = roleMapper.toRole(roleRequest);
         role.setPermissions(new HashSet<>(permissions));
