@@ -17,8 +17,8 @@ spring:
     show-sql: true
   jwt:
     signerKey: "Qc955jB8ZTIYl65VjJtY1LBLmrnie0TWUsg8rrgPPNfA519xN4Dz5peb3RsYF/C4"
-    valid-duration: 5 #seccon
-    refreshable-duration: 120 #second
+    valid-duration: 3600 #seccon
+    refreshable-duration: 36000 #second
   logging:
     level:
       org.hibernate.SQL: DEBUG

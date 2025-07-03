@@ -1,0 +1,68 @@
+package com.boot1.Controller;
+
+import com.boot1.dto.request.UserCreationRequest;
+import com.boot1.dto.response.UserResponse;
+import com.boot1.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import java.time.LocalDate;
+
+@Slf4j
+@SpringBootTest
+@AutoConfigureMockMvc
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class UserControllerTest {
+    @Autowired
+    MockMvc mockMvc;
+    @MockitoBean
+    UserService userService;
+    UserCreationRequest userCreationRequest;
+    UserResponse userResponse;
+    LocalDate dob;
+    @BeforeEach
+    void initData() {
+        dob = LocalDate.of( 2005 , 1 ,1 );
+        userCreationRequest = UserCreationRequest.builder()
+                .username("test")
+                .firstName("test")
+                .lastName("test")
+                .password("testtest")
+                .dob(dob).build();
+        userResponse = UserResponse.builder()
+                                   .username("test")
+                                   .firstName("test")
+                                   .lastName("test")
+                                   .id("sontaypham")
+                                   .build();
+    }
+    @Test
+    void createUser () throws Exception {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(userCreationRequest);
+        Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
+        // when
+        mockMvc.perform(post("users/create").content(content).contentType(MediaType.APPLICATION_JSON_VALUE))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.jsonPath("code").value(1));
+        // then
+    }
+}

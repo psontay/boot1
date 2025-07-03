@@ -119,7 +119,7 @@ public class AuthenticationService {
     }
     public void logout( LogoutRequest request) throws ParseException , JOSEException {
         try {
-            var signToken = verifyToken(request.getToken() , false);
+            var signToken = verifyToken(request.getToken() , true);
             String jti = signToken.getJWTClaimsSet().getJWTID();
             Date expTime = signToken.getJWTClaimsSet().getExpirationTime();
             InvalidatedToken invalidatedToken = InvalidatedToken.builder()

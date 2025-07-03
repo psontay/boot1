@@ -42,7 +42,7 @@ public class UserService {
     RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
-    public User createUser( UserCreationRequest request) {
+    public UserResponse createUser( UserCreationRequest request) {
         if ( userRepository.existsByUsername(request.getUsername())) throw new ApiException(ErrorCode.USER_EXISTS);
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -51,7 +51,8 @@ public class UserService {
         Set<Role> roles = new HashSet<>();
         roles.add(role);
         user.setRoles(roles);
-        return userRepository.save(user);
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
     }
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse findUserById(@NonNull String id) {
