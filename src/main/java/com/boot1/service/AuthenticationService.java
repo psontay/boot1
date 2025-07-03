@@ -5,8 +5,10 @@ import com.boot1.Entities.User;
 import com.boot1.dto.request.AuthenticationRequest;
 import com.boot1.dto.request.IntrospectRequest;
 import com.boot1.dto.request.LogoutRequest;
+import com.boot1.dto.request.RefreshRequest;
 import com.boot1.dto.response.AuthenticationResponse;
 import com.boot1.dto.response.IntrospectResponse;
+import com.boot1.dto.response.RefreshResponse;
 import com.boot1.exception.ApiException;
 import com.boot1.exception.ErrorCode;
 import com.boot1.repository.InvalidatedTokenRepository;
@@ -127,5 +129,22 @@ public class AuthenticationService {
         if ( !verified && expTime.after(new Date()) ) throw new ApiException(ErrorCode.UNAUTHENTICATED);
         if ( invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()) ) throw new ApiException(ErrorCode.UNAUTHENTICATED);
         return signedJWT;
+    }
+    public RefreshResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
+        var signJWT = verifyToken(request.getToken());
+        var jti = signJWT.getJWTClaimsSet().getJWTID();
+        var expTime = signJWT.getJWTClaimsSet().getExpirationTime();
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                                                            .id(jti)
+                                                            .expTime(expTime)
+                                                            .build();
+        invalidatedTokenRepository.save(invalidatedToken);
+        var username = signJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
+        var refreshToken = generateToken(user);
+        return RefreshResponse.builder()
+                              .token(refreshToken)
+                              .success(true)
+                              .build();
     }
 }

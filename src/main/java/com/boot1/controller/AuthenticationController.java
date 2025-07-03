@@ -3,9 +3,11 @@ package com.boot1.controller;
 import com.boot1.dto.request.AuthenticationRequest;
 import com.boot1.dto.request.IntrospectRequest;
 import com.boot1.dto.request.LogoutRequest;
+import com.boot1.dto.request.RefreshRequest;
 import com.boot1.dto.response.ApiResponse;
 import com.boot1.dto.response.AuthenticationResponse;
 import com.boot1.dto.response.IntrospectResponse;
+import com.boot1.dto.response.RefreshResponse;
 import com.boot1.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
@@ -41,5 +43,10 @@ public class AuthenticationController {
     ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
         return ApiResponse.<Void>builder().build();
+    }
+    @PostMapping("/refresh")
+    ApiResponse<RefreshResponse> refreshToken( @RequestBody RefreshRequest request) throws ParseException, JOSEException {
+        var ans = authenticationService.refreshToken(request);
+        return ApiResponse.<RefreshResponse>builder().result(ans).build();
     }
 }

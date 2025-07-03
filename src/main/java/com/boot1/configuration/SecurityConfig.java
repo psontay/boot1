@@ -14,14 +14,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import javax.crypto.spec.SecretKeySpec;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,7 +23,8 @@ import java.util.Collection;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINTS = { "/users/create" , "/auth/login" , "/auth/introspect" , "/auth/logout"};
+    private final String[] PUBLIC_ENDPOINTS = { "/users/create" , "/auth/login" , "/auth/introspect" ,
+            "/auth/logout" , "/auth/refresh"};
     @Value("${spring.jwt.signerKey}")
     private String signerKey;
     @Autowired
