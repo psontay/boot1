@@ -54,15 +54,14 @@ public class UserControllerTest {
                                    .build();
     }
     @Test
-    void createUser () throws Exception {
+    void createUser_validRequest_success () throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
         String content = objectMapper.writeValueAsString(userCreationRequest);
         Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
-        // when
+        // when then
         mockMvc.perform(post("users/create").content(content).contentType(MediaType.APPLICATION_JSON_VALUE))
                .andExpect(MockMvcResultMatchers.status().isOk())
                .andExpect(MockMvcResultMatchers.jsonPath("code").value(1));
-        // then
     }
 }
