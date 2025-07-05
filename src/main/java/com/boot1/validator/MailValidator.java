@@ -9,7 +9,7 @@ public class MailValidator implements ConstraintValidator<MailConstraint, String
     private String domain;
     @Override
     public boolean isValid (String userMail , ConstraintValidatorContext context) {
-        if (Objects.isNull(userMail)) return false;
+        if ( userMail == null || userMail.isBlank()) return true;
         return userMail.startsWith(this.domain) && userMail.endsWith("@gmail.com");
     }
     @Override

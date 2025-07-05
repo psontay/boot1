@@ -164,5 +164,18 @@ public class UserControllerTest {
                .andExpect(MockMvcResultMatchers.jsonPath("code").value(-11))
                .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Invalid date of birth , must be at least 18 years old"));
     }
-
+    @Test
+    void createUser_emailBlank_fail() throws Exception {
+        // given
+        userCreationRequest.setEmail("");
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create")
+                                .content(jsonBody)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest())
+               .andExpect(MockMvcResultMatchers.jsonPath("code").value(-19))
+               .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Email is empty"));
+    }
 }

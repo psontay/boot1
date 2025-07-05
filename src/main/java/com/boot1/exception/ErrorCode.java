@@ -30,6 +30,7 @@ public enum ErrorCode {
     PASSWORD_TYPE_INVALID(-16 , "Password must be at least 1 character upper" , HttpStatus.BAD_REQUEST),
     FIRST_NAME_EMPTY(-17 , "First name is empty" , HttpStatus.BAD_REQUEST),
     LAST_NAME_EMPTY(-18 , "Last name is empty" , HttpStatus.BAD_REQUEST),
+    EMAIL_EMPTY(-19 , "Email is empty" , HttpStatus.BAD_REQUEST),
     ;
 
     int code;
