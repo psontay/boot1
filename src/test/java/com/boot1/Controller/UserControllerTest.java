@@ -149,5 +149,20 @@ public class UserControllerTest {
                .andExpect(MockMvcResultMatchers.jsonPath("code").value(-18))
                .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Last name is empty"));
     }
+    @Test
+    void createUser_dobUnderage_fail() throws Exception {
+        // given
+        LocalDate underageDob = LocalDate.now().minusYears(17);
+        userCreationRequest.setDob(underageDob);
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create")
+                                .content(jsonBody)
+                                .contentType(MediaType.APPLICATION_JSON_VALUE))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest())
+               .andExpect(MockMvcResultMatchers.jsonPath("code").value(-11))
+               .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Invalid date of birth , must be at least 18 years old"));
+    }
 
 }
