@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -82,5 +83,18 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(-15))
                 .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Username must be at least 1 character upper")
         );
+    }
+    @Test
+    void createUser_usernameTooShort_fail () throws Exception {
+        // given
+        userCreationRequest.setUsername("Te");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create").content(jsonBody).contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(-2))
+                .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Username must be at least 3 characters"));
     }
 }

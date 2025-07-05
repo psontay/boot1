@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreationRequest {
     @NotBlank(message = "Username is required")
-    @Size(min = 3 , message = "USERNAME_INVALID")
+    @Size(min = 3 , message = "USERNAME_LENGTH_INVALID")
     @UsernameConstraint( message = "USERNAME_TYPE_INVALID")
     String username;
     @NotBlank(message = "Password is required")
