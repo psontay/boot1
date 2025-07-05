@@ -58,11 +58,29 @@ public class UserControllerTest {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        String content = objectMapper.writeValueAsString(userCreationRequest);
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
         Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
         // when then
-        mockMvc.perform(post("/users/create").content(content).contentType(MediaType.APPLICATION_JSON_VALUE))
+        mockMvc.perform(post("/users/create").content(jsonBody).contentType(MediaType.APPLICATION_JSON_VALUE))
                .andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.jsonPath("code").value(1));
+               .andExpect(MockMvcResultMatchers.jsonPath("code").value(1))
+               .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("sontaypham")
+
+        );
+
+    }
+    @Test
+    void createUser_usernameMissingUpperCase_fail () throws Exception {
+        // given
+        userCreationRequest.setUsername("test");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create").content(jsonBody).contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(-15))
+                .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Username must be at least 1 character upper")
+        );
     }
 }
