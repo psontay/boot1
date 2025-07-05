@@ -97,4 +97,8 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(-2))
                 .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Username must be at least 3 characters"));
     }
+    @Test
+    void createUser_passwordTooShort_fail () throws Exception {
+        userCreationRequest.setPassword("Te");
+    }
 }
