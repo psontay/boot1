@@ -3,6 +3,7 @@ package com.boot1.Service;
 import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.response.UserResponse;
+import com.boot1.exception.ApiException;
 import com.boot1.mapper.UserMapper;
 import com.boot1.repository.UserRepository;
 import com.boot1.service.UserService;
@@ -74,5 +75,11 @@ public class UserServiceTest {
         Assertions.assertEquals("sontaypham" , response.getId());
         Assertions.assertEquals("Test", response.getUsername());
 
+    }
+    @Test
+    void createUser_existingUsername_fail()  {
+        Mockito.when(userRepository.existsByUsername(anyString())).thenReturn(true);
+        var exception = Assertions.assertThrows(ApiException.class , () -> userService.createUser(userCreationRequest));
+        Assertions.assertEquals(-1, exception.getErrorCode().getCode());
     }
 }
