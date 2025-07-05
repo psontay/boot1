@@ -99,6 +99,28 @@ public class UserControllerTest {
     }
     @Test
     void createUser_passwordTooShort_fail () throws Exception {
+        // given
         userCreationRequest.setPassword("Te");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create").content(jsonBody).contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("code").value(-3))
+                .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Password must be at least 6 characters"));
+    }
+    @Test
+    void createUser_passwordMissingUpperCase_fail () throws Exception {
+        // given
+        userCreationRequest.setPassword("testpassword");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create").content(jsonBody).contentType(MediaType.APPLICATION_JSON_VALUE))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest())
+               .andExpect(MockMvcResultMatchers.jsonPath("code").value(-16))
+               .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Password must be at least 1 character upper"));
     }
 }
