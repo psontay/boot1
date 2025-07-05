@@ -97,5 +97,9 @@ public class UserServiceTest {
     @Test
     void findUserById_notFoundId_fail()  {
         Mockito.when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+        var exception = Assertions.assertThrows(RuntimeException.class , () -> userService.findUserById(anyString()));
+        Assertions.assertEquals("User not found", exception.getMessage());
     }
+    @Test
+    
 }
