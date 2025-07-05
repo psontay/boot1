@@ -95,5 +95,7 @@ public class UserServiceTest {
         Mockito.when(userMapper.toUserResponse(any())).thenReturn(userResponse);
     }
     @Test
-    void 
+    void findUserById_notFoundId_fail()  {
+        Mockito.when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+    }
 }
