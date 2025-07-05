@@ -5,6 +5,7 @@ import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.response.UserResponse;
 import com.boot1.exception.ApiException;
 import com.boot1.mapper.UserMapper;
+import com.boot1.repository.RoleRepository;
 import com.boot1.repository.UserRepository;
 import com.boot1.service.UserService;
 import lombok.AccessLevel;
@@ -12,10 +13,11 @@ import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -28,10 +30,15 @@ import static org.mockito.ArgumentMatchers.anyString;
 public class UserServiceTest {
     @Autowired
     UserService userService;
-    @MockitoBean
+    @Mock
     UserMapper userMapper;
-    @MockitoBean
+    @Mock
     UserRepository userRepository;
+    @Mock
+    RoleRepository roleRepository;
+    @Mock
+    PasswordEncoder passwordEncoder;
+
     UserCreationRequest userCreationRequest;
     UserResponse userResponse;
     User user;
@@ -82,4 +89,11 @@ public class UserServiceTest {
         var exception = Assertions.assertThrows(ApiException.class , () -> userService.createUser(userCreationRequest));
         Assertions.assertEquals(-1, exception.getErrorCode().getCode());
     }
+    @Test
+    void findUserById_validId_success()  {
+        Mockito.when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        Mockito.when(userMapper.toUserResponse(any())).thenReturn(userResponse);
+    }
+    @Test
+    void 
 }
