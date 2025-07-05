@@ -22,9 +22,9 @@ public class UserCreationRequest {
     @Size(min = 6, message = "PASSWORD_INVALID")
     @PasswordConstraint( message = "PASSWORD_TYPE_INVALID")
     String password;
-    @NotBlank(message = "Firstname is required")
+    @NotBlank(message = "FIRST_NAME_EMPTY")
     String firstName;
-    @NotBlank(message = "Lastname is required")
+    @NotBlank(message = "LAST_NAME_EMPTY")
     String lastName;
     @DobConstraint(min = 18 , message = "INVALID_DATE_OF_BIRTH")
     LocalDate dob;

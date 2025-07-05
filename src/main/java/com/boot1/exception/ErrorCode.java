@@ -28,6 +28,8 @@ public enum ErrorCode {
     INVALID_EMAIL_TYPE(-14 , "Invalid email type , must start with {domain} & end with @gmail.com" , HttpStatus.BAD_REQUEST),
     USERNAME_TYPE_INVALID(-15 , "Username must be at least 1 character upper" , HttpStatus.BAD_REQUEST),
     PASSWORD_TYPE_INVALID(-16 , "Password must be at least 1 character upper" , HttpStatus.BAD_REQUEST),
+    FIRST_NAME_EMPTY(-17 , "First name is empty" , HttpStatus.BAD_REQUEST),
+    LAST_NAME_EMPTY(-18 , "Last name is empty" , HttpStatus.BAD_REQUEST),
     ;
 
     int code;

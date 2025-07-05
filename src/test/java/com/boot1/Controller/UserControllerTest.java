@@ -45,7 +45,7 @@ public class UserControllerTest {
                 .firstName("test")
                 .lastName("test")
                 .email("user@test@gmail.com")
-                .password("testtest")
+                .password("Testtest")
                 .dob(dob).build();
         userResponse = UserResponse.builder()
                                    .username("Test")
@@ -123,4 +123,31 @@ public class UserControllerTest {
                .andExpect(MockMvcResultMatchers.jsonPath("code").value(-16))
                .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Password must be at least 1 character upper"));
     }
+    @Test
+    void createUser_firstNameBlank_fail () throws Exception {
+        // given
+        userCreationRequest.setFirstName("");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create").content(jsonBody).contentType(MediaType.APPLICATION_JSON_VALUE))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest())
+               .andExpect(MockMvcResultMatchers.jsonPath("code").value(-17))
+               .andExpect(MockMvcResultMatchers.jsonPath("msg").value("First name is empty"));
+    }
+    @Test
+    void createUser_lastNameBlank_fail () throws Exception {
+        // given
+        userCreationRequest.setLastName("");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String jsonBody = objectMapper.writeValueAsString(userCreationRequest);
+        // when then
+        mockMvc.perform(post("/users/create").content(jsonBody).contentType(MediaType.APPLICATION_JSON_VALUE))
+               .andExpect(MockMvcResultMatchers.status().isBadRequest())
+               .andExpect(MockMvcResultMatchers.jsonPath("code").value(-18))
+               .andExpect(MockMvcResultMatchers.jsonPath("msg").value("Last name is empty"));
+    }
+
 }
