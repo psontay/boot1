@@ -1,5 +1,6 @@
 package com.boot1.Service;
 
+import com.boot1.Entities.Role;
 import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.response.UserResponse;
@@ -10,25 +11,30 @@ import com.boot1.repository.UserRepository;
 import com.boot1.service.UserService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @FieldDefaults( level = AccessLevel.PRIVATE)
 public class UserServiceTest {
-    @Autowired
+    @InjectMocks
     UserService userService;
     @Mock
     UserMapper userMapper;
@@ -72,34 +78,47 @@ public class UserServiceTest {
     @Test
     void createUser_validRequest_success()  {
         // given
-        Mockito.when(userRepository.existsByUsername(anyString())).thenReturn(false);
-        Mockito.when(userMapper.toUser(any())).thenReturn(user);
-        Mockito.when(userRepository.save(any())).thenReturn(user);
-        Mockito.when(userMapper.toUserResponse(any())).thenReturn(userResponse);
+        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userMapper.toUser(any())).thenReturn(user);
+        when(userRepository.save(any())).thenReturn(user);
+        when(userMapper.toUserResponse(any())).thenReturn(userResponse);
         // when
         var response = userService.createUser(userCreationRequest);
         // then
-        Assertions.assertEquals("sontaypham" , response.getId());
-        Assertions.assertEquals("Test", response.getUsername());
+        assertEquals("sontaypham" , response.getId());
+        assertEquals("Test", response.getUsername());
 
     }
     @Test
     void createUser_existingUsername_fail()  {
-        Mockito.when(userRepository.existsByUsername(anyString())).thenReturn(true);
+        when(userRepository.existsByUsername(anyString())).thenReturn(true);
         var exception = Assertions.assertThrows(ApiException.class , () -> userService.createUser(userCreationRequest));
-        Assertions.assertEquals(-1, exception.getErrorCode().getCode());
+        assertEquals(-1, exception.getErrorCode().getCode());
     }
     @Test
     void findUserById_validId_success()  {
-        Mockito.when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
-        Mockito.when(userMapper.toUserResponse(any())).thenReturn(userResponse);
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(userMapper.toUserResponse(any())).thenReturn(userResponse);
     }
     @Test
     void findUserById_notFoundId_fail()  {
-        Mockito.when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
         var exception = Assertions.assertThrows(RuntimeException.class , () -> userService.findUserById(anyString()));
-        Assertions.assertEquals("User not found", exception.getMessage());
+        assertEquals("User not found", exception.getMessage());
     }
     @Test
-    
+    void getUsers_hasUsers_success() {
+
+        User user = new User();
+        user.setRoles(Set.of(Role.builder().name("ADMIN").build()));
+
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userMapper.toUserResponse(user)).thenReturn(new UserResponse());
+
+        // Act
+        List<UserResponse> result = userService.getUsers();
+
+        // Assert
+        assertEquals(1, result.size());
+    }
 }
