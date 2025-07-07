@@ -3,7 +3,9 @@ package com.boot1.Service;
 import com.boot1.Boot1Application;
 import com.boot1.Entities.Role;
 import com.boot1.Entities.User;
+import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.response.UserResponse;
+import com.boot1.exception.ApiException;
 import com.boot1.repository.UserRepository;
 import com.boot1.mapper.UserMapper;
 import com.boot1.service.UserService;
@@ -51,6 +53,7 @@ class UserServiceIntegrationTest {
 
     User user;
     UserResponse userResponse;
+    UserCreationRequest userCreationRequest;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +67,14 @@ class UserServiceIntegrationTest {
                    .dob(LocalDate.of(2000, 1, 1))
                    .roles(Set.of(Role.builder().name("ADMIN").build()))
                    .build();
-
+        userCreationRequest = UserCreationRequest.builder()
+                .username("Test")
+                .firstName("test")
+                .lastName("test")
+                .email("user@test.com")
+                .password("irrelevant")
+                .dob(LocalDate.of(2000, 1, 1))
+                .build();
         userResponse = UserResponse.builder()
                                    .id("sontaypham")
                                    .username("Test")
@@ -74,7 +84,24 @@ class UserServiceIntegrationTest {
                                    .dob(LocalDate.of(2000, 1, 1))
                                    .build();
     }
-
+    @Test
+    @WithMockUser(username = "Test")
+    void createUser_success() {
+        when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
+        when(userMapper.toUser(userCreationRequest)).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        UserResponse userResponse = userService.createUser(userCreationRequest);
+        assertEquals("Test", userResponse.getUsername());
+        assertEquals("sontaypham" , userResponse.getId());
+    }
+    @Test
+    @WithMockUser(username = "Test")
+    void createUser_usernameExists_fail() {
+        when(userRepository.existsByUsername(user.getUsername())).thenReturn(true);
+        var exception = assertThrows(ApiException.class , () -> userService.createUser(userCreationRequest));
+        assertEquals("Username already exists", exception.getMessage());
+    }
     @Test
     @WithMockUser(roles = "ADMIN")
     void getUsers_asAdmin_success() {
@@ -137,4 +164,5 @@ class UserServiceIntegrationTest {
         UserResponse result = userService.getMyI4();
         assertEquals(fakeUserResponse, result);
     }
+
 }

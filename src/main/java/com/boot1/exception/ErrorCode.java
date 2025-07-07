@@ -31,6 +31,7 @@ public enum ErrorCode {
     FIRST_NAME_EMPTY(-17 , "First name is empty" , HttpStatus.BAD_REQUEST),
     LAST_NAME_EMPTY(-18 , "Last name is empty" , HttpStatus.BAD_REQUEST),
     EMAIL_EMPTY(-19 , "Email is empty" , HttpStatus.BAD_REQUEST),
+    USERNAME_EXISTS(-20 , "Username already exists" , HttpStatus.CONFLICT),
     ;
 
     int code;

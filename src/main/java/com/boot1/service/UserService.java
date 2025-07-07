@@ -43,7 +43,7 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     public UserResponse createUser( UserCreationRequest request) {
-        if ( userRepository.existsByUsername(request.getUsername())) throw new ApiException(ErrorCode.USER_EXISTS);
+        if ( userRepository.existsByUsername(request.getUsername())) throw new ApiException(ErrorCode.USERNAME_EXISTS);
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role role = roleRepository.findByName(RoleName.USER.name())
