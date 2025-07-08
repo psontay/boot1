@@ -105,14 +105,28 @@ public class UserServiceTest {
     }
     @Test
     void getMyI4_valid_success() {
+        // given
         var auth = new UsernamePasswordAuthenticationToken("Test", null, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
         when(userRepository.findByUsername(eq("Test"))).thenReturn(Optional.of(user));
         when(userMapper.toUserResponse(user)).thenReturn(userResponse);
-
+        // when
         var response = userService.getMyI4();
-
+        // then
         Assertions.assertThat(response.getUsername()).isEqualTo("Test");
         Assertions.assertThat(response.getId()).isEqualTo("sontaypham");
     }
+    @Test
+    void getMyI4_invalidRequest_fail() {
+        // given
+        var auth = new UsernamePasswordAuthenticationToken("Test", null, null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(userRepository.findByUsername(eq("Test"))).thenReturn(Optional.empty());
+        // when
+        ApiException exception = assertThrows(ApiException.class, () -> userService.getMyI4());
+        // then
+        Assertions.assertThat(exception.getMessage()).isEqualTo("User not exists");
+
+    }
+
 }
