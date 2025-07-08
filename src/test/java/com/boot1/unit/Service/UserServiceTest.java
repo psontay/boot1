@@ -3,6 +3,7 @@ package com.boot1.unit.Service;
 import com.boot1.Entities.Role;
 import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
+import com.boot1.dto.request.UserUpdateRequest;
 import com.boot1.dto.response.UserResponse;
 import com.boot1.enums.RoleName;
 import com.boot1.exception.ApiException;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -42,6 +44,7 @@ public class UserServiceTest {
     UserCreationRequest userCreationRequest;
     UserResponse userResponse;
     User user;
+    UserUpdateRequest userUpdateRequest;
     Role role;
     @BeforeEach
     void initData() {
@@ -70,6 +73,12 @@ public class UserServiceTest {
         role = Role.builder()
                    .name(RoleName.USER.name())
                    .build();
+        userUpdateRequest = UserUpdateRequest.builder()
+                   .firstName("test")
+                   .lastName("test")
+                   .email("user@testupdate@gmail.com")
+                   .password("Testtest")
+                   .dob(dob).build();
     }
     @Test
     void createUser_validRequest_success() {
@@ -126,7 +135,31 @@ public class UserServiceTest {
         ApiException exception = assertThrows(ApiException.class, () -> userService.getMyI4());
         // then
         Assertions.assertThat(exception.getMessage()).isEqualTo("User not exists");
-
     }
+    @Test
+    void updateUser_valid_success() {
+        // given
+        userUpdateRequest.setPassword("newPassword");
+        userUpdateRequest.setRoles(Set.of("ADMIN"));
+        Role adminRole = Role.builder().name("ADMIN").build();
+        when(userRepository.findById("sontaypham")).thenReturn(Optional.of(user));
+        doAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            UserUpdateRequest r = invocation.getArgument(1);
+            u.setPassword(r.getPassword());
+            return null;
+        }).when(userMapper).updateUser(any(), any());
 
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPass");
+        when(roleRepository.findByNameIn(any())).thenReturn(Set.of(adminRole));
+        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        // When
+        User updated = userService.updateUser("sontaypham", userUpdateRequest);
+
+        // Then
+        assertEquals("encodedPass", updated.getPassword());
+        assertTrue(updated.getRoles().contains(adminRole));
+        verify(userRepository).save(updated);
+    }
 }
