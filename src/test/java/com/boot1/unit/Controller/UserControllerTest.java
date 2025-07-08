@@ -1,4 +1,4 @@
-package com.boot1.Controller;
+package com.boot1.unit.Controller;
 
 import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.response.UserResponse;
