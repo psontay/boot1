@@ -8,7 +8,7 @@ spring:
     url: jdbc:mysql://172.17.0.2:3306/db1?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
     hikari:
       driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:

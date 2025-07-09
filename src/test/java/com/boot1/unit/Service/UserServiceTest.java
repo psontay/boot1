@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource("/test.properties")
 public class UserServiceTest {
     @InjectMocks
     UserService userService;
