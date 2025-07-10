@@ -1,6 +1,5 @@
 package com.boot1.intergation.Service;
 
-import com.boot1.Boot1Application;
 import com.boot1.Entities.Role;
 import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
@@ -12,7 +11,6 @@ import com.boot1.mapper.UserMapper;
 import com.boot1.service.UserService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +24,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -153,6 +147,5 @@ class UserServiceIT {
                 "Unauthenticated invocation must throw AuthenticationCredentialsNotFoundException"
                     );
     }
-
 
 }

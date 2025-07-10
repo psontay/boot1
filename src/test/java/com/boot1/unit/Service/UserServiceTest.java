@@ -26,6 +26,7 @@ import org.springframework.test.context.TestPropertySource;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -164,4 +165,18 @@ public class UserServiceTest {
         assertTrue(updated.getRoles().contains(adminRole));
         verify(userRepository).save(updated);
     }
+    @Test
+    void getUsers_validRequest_success() {
+        // given
+        role = Role.builder().name(RoleName.ADMIN.name()).build();
+        user.setRoles(Set.of(role));
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        // when
+        var response = userService.getUsers();
+        // then
+        assertEquals("Test" , response.getFirst().getUsername());
+        assertEquals(1 , response.size());
+    }
+
 }
