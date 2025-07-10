@@ -4,6 +4,7 @@ import com.boot1.Entities.Role;
 import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.response.UserResponse;
+import com.boot1.enums.RoleName;
 import com.boot1.exception.ApiException;
 import com.boot1.repository.RoleRepository;
 import com.boot1.repository.UserRepository;
@@ -16,8 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -31,6 +31,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -43,13 +45,13 @@ class UserServiceIT {
     @Autowired
     MockMvc mockMvc;
 
-    UserRepository userRepository;
+    @MockBean UserRepository userRepository;
 
-     UserMapper userMapper;
+    @MockBean UserMapper userMapper;
 
-     PasswordEncoder passwordEncoder;
+    @MockBean PasswordEncoder passwordEncoder;
 
-     RoleRepository roleRepository;
+    @MockBean RoleRepository roleRepository;
 
     User user;
     UserResponse userResponse;
@@ -65,7 +67,7 @@ class UserServiceIT {
                    .email("user@test.com")
                    .password("irrelevant")
                    .dob(LocalDate.of(2000, 1, 1))
-                   .roles(Set.of(Role.builder().name("ADMIN").build()))
+                   .roles(Set.of(Role.builder().name(RoleName.USER.name()).build()))
                    .build();
         userCreationRequest = UserCreationRequest.builder()
                                                  .username("Test")
@@ -89,6 +91,7 @@ class UserServiceIT {
     void createUser_validRequest_success() {
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
         when(userMapper.toUser(userCreationRequest)).thenReturn(user);
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(Role.builder().name(RoleName.USER.name()).build()));
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         UserResponse userResponse = userService.createUser(userCreationRequest);
@@ -108,7 +111,8 @@ class UserServiceIT {
     void createUser_roleInvalid_fail() {
         // given
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.empty());
+        when(userMapper.toUser(userCreationRequest)).thenReturn(user);
+        when(roleRepository.findByName("USER")).thenReturn(Optional.empty());
         var exception = assertThrows(ApiException.class , () -> userService.createUser(userCreationRequest));
         assertEquals("Role not found", exception.getMessage());
     }
@@ -127,25 +131,15 @@ class UserServiceIT {
 
     @Test
     @WithMockUser(roles = "USER")
-    void getUsers_asUser_accessDenied() {
-        when(userRepository.findAll()).thenReturn(List.of(user));
-
-        assertThrows(
-                AccessDeniedException.class,
-                () -> userService.getUsers(),
-                "User with ROLE_USER must not be allowed to call getUsers()"
-                    );
+    void getUsers_asUser_accessDenied() throws Exception {
+        mockMvc.perform(get("/users/list"))
+               .andExpect(status().isForbidden());
     }
 
     @Test
-    void getUsers_noAuthentication_unauthenticated() {
-        when(userRepository.findAll()).thenReturn(List.of(user));
-
-        assertThrows(
-                AuthenticationCredentialsNotFoundException.class,
-                () -> userService.getUsers(),
-                "Unauthenticated invocation must throw AuthenticationCredentialsNotFoundException"
-                    );
+    void getUsers_noAuthentication_unauthenticated() throws Exception {
+        mockMvc.perform(get("/users/list"))
+               .andExpect(status().isUnauthorized())
+               .andExpect(jsonPath("$.length()").value(2));
     }
-
 }
