@@ -1,4 +1,4 @@
-package com.boot1.intergation.Service;
+package com.boot1.integration.Service;
 
 import com.boot1.Entities.Role;
 import com.boot1.Entities.User;
@@ -141,5 +141,23 @@ class UserServiceIT {
         mockMvc.perform(get("/users/list"))
                .andExpect(status().isUnauthorized())
                .andExpect(jsonPath("$.length()").value(2));
+    }
+    @Test
+    @WithMockUser( username = "Test")
+    void findUserById_validRequest_success() throws Exception {
+        // given
+        when(userRepository.findById("sontaypham")).thenReturn(Optional.of(user));
+        when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        // when then
+        mockMvc.perform(get("/users/findById/sontaypham")).andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser( username = "test")
+    void findUserById_usernameNotEquals_fail() throws Exception {
+        // given
+        when(userRepository.findById("sontaypham")).thenReturn(Optional.empty());
+        when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        // when then
+        mockMvc.perform(get("/users/findById/sontaypham")).andExpect(status().isBadRequest());
     }
 }

@@ -178,4 +178,5 @@ public class UserServiceTest {
         assertEquals("Test" , response.getFirst().getUsername());
         assertEquals(1 , response.size());
     }
+
 }
