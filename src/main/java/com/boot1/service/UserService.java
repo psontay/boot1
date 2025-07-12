@@ -73,40 +73,40 @@ public class UserService {
                                  .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
         return userMapper.toUserResponse(user);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse findUserByUsername(String username) {
         var user = userRepository.findByUsername(username)
                                  .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
         return userMapper.toUserResponse(user);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse findUserByEmail(String email) {
         var user = userRepository.findByEmail(email)
                                  .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
         return userMapper.toUserResponse(user);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> findByFirstName(String firstName) {
         return userRepository.findByFirstNameContaining(firstName)
                              .stream()
                              .map(userMapper::toUserResponse)
                              .toList();
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> findByFirstAndLastName(String firstName, String lastName) {
         return userRepository.findByFirstNameAndLastName(firstName, lastName)
                              .stream()
                              .map(userMapper::toUserResponse)
                              .toList();
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> findByLastName(String lastName) {
         return userRepository.findByLastNameContaining(lastName)
                              .stream()
                              .map(userMapper::toUserResponse)
                              .toList();
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse updateUser(String id, UserUpdateRequest request) {
         var user = userRepository.findById(id)
                                  .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
@@ -118,7 +118,6 @@ public class UserService {
         userRepository.save(user);
         return userMapper.toUserResponse(user);
     }
-
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public void deleteUser(String id) {
         userRepository.deleteById(id);

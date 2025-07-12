@@ -161,19 +161,34 @@ class UserServiceIT {
         mockMvc.perform(get("/users/findById/sontaypham")).andExpect(status().isBadRequest());
     }
     @Test
-    @WithMockUser( username = "Test")
-    void getUserByUsername_validRequest_success() throws Exception {
+    @WithMockUser( roles = "ADMIN")
+    void findUserByUsername_validRequest_success() throws Exception {
         // given
         when(userRepository.findByUsername("Test")).thenReturn(Optional.of(user));
         mockMvc.perform(get("/users/findByUsername/Test")).andExpect(status().isOk());
     }
     @Test
-    @WithMockUser( username = "Test")
-    void getUserByUsername_usernameNotFound_fail() throws Exception {
+    @WithMockUser( roles = "ADMIN")
+    void findUserByUsername_usernameNotFound_fail() throws Exception {
         // given
         when(userRepository.findByUsername("test")).thenReturn(Optional.empty());
         // when then
         mockMvc.perform(get("/users/findByUsername/test")).andExpect(status().isNotFound());
     }
-
+    @Test
+    @WithMockUser( username = "Test" , roles = "ADMIN")
+    void findUserByEmail_validRequest_success() throws Exception {
+        // given
+        when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
+        // when then
+        mockMvc.perform(get("/users/findByEmail/user@test.com")).andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser ( username = "Test" , roles = "ADMIN")
+    void findUserByEmail_emailNotFound_fail() throws Exception {
+        // given
+        when(userRepository.findByEmail("test")).thenReturn(Optional.empty());
+        //when then
+        mockMvc.perform(get("/users/findByEmail/test")).andExpect(status().isNotFound());
+    }
 }

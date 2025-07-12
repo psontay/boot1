@@ -15,6 +15,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -116,14 +117,14 @@ public class UserServiceTest {
         assertEquals("Role not found", exception.getMessage());
     }
     @Test
-    void getMyI4_valid_success() {
+    void getMyProfile_valid_success() {
         // given
         var auth = new UsernamePasswordAuthenticationToken("Test", null, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
         when(userRepository.findByUsername(eq("Test"))).thenReturn(Optional.of(user));
         when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         // when
-        var response = userService.getMyI4();
+        var response = userService.getMyProfile();
         // then
         Assertions.assertThat(response.getUsername()).isEqualTo("Test");
         Assertions.assertThat(response.getId()).isEqualTo("sontaypham");
@@ -135,7 +136,7 @@ public class UserServiceTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
         when(userRepository.findByUsername(eq("Test"))).thenReturn(Optional.empty());
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> userService.getMyI4());
+        ApiException exception = assertThrows(ApiException.class, () -> userService.getMyProfile());
         // then
         Assertions.assertThat(exception.getMessage()).isEqualTo("User not exists");
     }
@@ -145,26 +146,41 @@ public class UserServiceTest {
         userUpdateRequest.setPassword("newPassword");
         userUpdateRequest.setRoles(Set.of("ADMIN"));
         Role adminRole = Role.builder().name("ADMIN").build();
-        when(userRepository.findById("sontaypham")).thenReturn(Optional.of(user));
+
+        when(userRepository.findById("sontaypham"))
+                .thenReturn(Optional.of(user));
+
         doAnswer(invocation -> {
             User u = invocation.getArgument(0);
             UserUpdateRequest r = invocation.getArgument(1);
-            u.setPassword(r.getPassword());
             return null;
-        }).when(userMapper).updateUser(any(), any());
+        }).when(userMapper)
+          .updateUser(any(User.class), any(UserUpdateRequest.class));
 
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPass");
-        when(roleRepository.findByNameIn(any())).thenReturn(Set.of(adminRole));
-        when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(passwordEncoder.encode("newPassword"))
+                .thenReturn("encodedPass");
 
-        // When
-        User updated = userService.updateUser("sontaypham", userUpdateRequest);
+        when(roleRepository.findByNameIn(Set.of("ADMIN")))
+                .thenReturn(Set.of(adminRole));
 
-        // Then
-        assertEquals("encodedPass", updated.getPassword());
-        assertTrue(updated.getRoles().contains(adminRole));
-        verify(userRepository).save(updated);
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        UserResponse updated = userService.updateUser("sontaypham", userUpdateRequest);
+
+        // then
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+        User saved = captor.getValue();
+
+        assertEquals("encodedPass", saved.getPassword());
+        assertTrue(saved.getRoles().contains(adminRole));
+
+        assertEquals("sontaypham", updated.getUsername());
+        assertTrue(updated.getRoles().contains("ADMIN"));
     }
+
     @Test
     void getUsers_validRequest_success() {
         // given
