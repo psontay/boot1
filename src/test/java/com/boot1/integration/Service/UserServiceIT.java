@@ -160,4 +160,20 @@ class UserServiceIT {
         // when then
         mockMvc.perform(get("/users/findById/sontaypham")).andExpect(status().isBadRequest());
     }
+    @Test
+    @WithMockUser( username = "Test")
+    void getUserByUsername_validRequest_success() throws Exception {
+        // given
+        when(userRepository.findByUsername("Test")).thenReturn(Optional.of(user));
+        mockMvc.perform(get("/users/findByUsername/Test")).andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser( username = "Test")
+    void getUserByUsername_usernameNotFound_fail() throws Exception {
+        // given
+        when(userRepository.findByUsername("test")).thenReturn(Optional.empty());
+        // when then
+        mockMvc.perform(get("/users/findByUsername/test")).andExpect(status().isNotFound());
+    }
+
 }

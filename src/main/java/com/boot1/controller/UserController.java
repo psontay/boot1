@@ -1,87 +1,111 @@
 package com.boot1.controller;
 
-import com.boot1.Entities.User;
 import com.boot1.dto.request.UserCreationRequest;
 import com.boot1.dto.request.UserUpdateRequest;
 import com.boot1.dto.response.ApiResponse;
 import com.boot1.dto.response.UserResponse;
-import com.boot1.mapper.UserMapper;
 import com.boot1.service.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserMapper userMapper;
+    private final UserService userService;
 
     @PostMapping("/create")
-    ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setCode(1);
-        apiResponse.setResult(userService.createUser(request));
-        return apiResponse;
-    }
-    @GetMapping("findById/{id}")
-    UserResponse findById(@PathVariable String id) {
-        return userService.findUserById(id);
-    }
-    @GetMapping("/list")
-    ApiResponse<List<UserResponse>> getUsers() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Username : {}" , authentication.getName());
-        authentication.getAuthorities().forEach( grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-        return ApiResponse.<List<UserResponse>>builder()
-                .result(userService.getUsers())
-                .build();
-    }
-    @GetMapping("/findByFirstName/{firstName}")
-    List<User> findByFirstName(@PathVariable String firstName) {
-        return userService.findUsersByFirstName(firstName);
-    }
-    @GetMapping("/findByFirstNameAndLastName")
-    List<User> findByFirstNameAndLastName(@RequestParam String firstName, @RequestParam String lastName) {
-        return userService.findUserByFirstNameAndLastName(firstName, lastName);
-    }
-    @GetMapping("findByUsername/{username}")
-    Optional<User> findByUsername(@PathVariable String username) {
-        return userService.getUserByUsername(username);
-    }
-    @GetMapping("/findByLastName/{lastName}")
-    List<User> findByLastName(@PathVariable String lastName) {
-        return userService.findUserByLastName(lastName);
-    }
-    @GetMapping("/findByEmail/{email}")
-    Optional<User> findByEmail ( @PathVariable String email) {
-        return userService.findUserByEmail(email);
-    }
-    @PutMapping ("updateUser/{id}")
-    User updateUser( @PathVariable String id, @RequestBody UserUpdateRequest userUpdateRequest) {
-        return userService.updateUser(id , userUpdateRequest);
-    }
-    @DeleteMapping("deleteUser/{id}")
-    void deleteUser(@PathVariable String id) {
-        userService.deleteUserById(id);
-    }
-    @GetMapping("/myi4")
-    ApiResponse<UserResponse> getMyI4() {
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<UserResponse>builder()
-                          .result(userService.getMyI4())
+                          .code(1)
+                          .result(userService.createUser(request))
                           .build();
     }
-    @GetMapping("/hi")
-    String hi() {
-        return "sontaypham";
+
+    @GetMapping("/findById/{id}")
+    public ApiResponse<UserResponse> findById(@PathVariable String id) {
+        return ApiResponse.<UserResponse>builder()
+                          .code(1)
+                          .result(userService.findUserById(id))
+                          .build();
+    }
+
+    @GetMapping("/list")
+    public ApiResponse<List<UserResponse>> getUsers() {
+        return ApiResponse.<List<UserResponse>>builder()
+                          .code(1)
+                          .result(userService.getUsers())
+                          .build();
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getMyProfile() {
+        return ApiResponse.<UserResponse>builder()
+                          .code(1)
+                          .result(userService.getMyProfile())
+                          .build();
+    }
+
+    @GetMapping("/findByUsername/{username}")
+    public ApiResponse<UserResponse> findByUsername(@PathVariable String username) {
+        return ApiResponse.<UserResponse>builder()
+                          .code(1)
+                          .result(userService.findUserByUsername(username))
+                          .build();
+    }
+
+    @GetMapping("/findByEmail/{email}")
+    public ApiResponse<UserResponse> findByEmail(@PathVariable String email) {
+        return ApiResponse.<UserResponse>builder()
+                          .code(1)
+                          .result(userService.findUserByEmail(email))
+                          .build();
+    }
+
+    @GetMapping("/findByFirstName/{firstName}")
+    public ApiResponse<List<UserResponse>> findByFirstName(@PathVariable String firstName) {
+        return ApiResponse.<List<UserResponse>>builder()
+                          .code(1)
+                          .result(userService.findByFirstName(firstName))
+                          .build();
+    }
+
+    @GetMapping("/findByFirstAndLastName")
+    public ApiResponse<List<UserResponse>> findByFirstAndLastName(
+            @RequestParam String firstName,
+            @RequestParam String lastName) {
+        return ApiResponse.<List<UserResponse>>builder()
+                          .code(1)
+                          .result(userService.findByFirstAndLastName(firstName, lastName))
+                          .build();
+    }
+
+    @GetMapping("/findByLastName/{lastName}")
+    public ApiResponse<List<UserResponse>> findByLastName(@PathVariable String lastName) {
+        return ApiResponse.<List<UserResponse>>builder()
+                          .code(1)
+                          .result(userService.findByLastName(lastName))
+                          .build();
+    }
+
+    @PutMapping("/update/{id}")
+    public ApiResponse<UserResponse> updateUser(
+            @PathVariable String id,
+            @RequestBody @Valid UserUpdateRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                          .code(1)
+                          .result(userService.updateUser(id, request))
+                          .build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse<Void> deleteUser(@PathVariable String id) {
+        userService.deleteUser(id);
+        return ApiResponse.<Void>builder().code(1).msg("Deleted successfully").build();
     }
 }
