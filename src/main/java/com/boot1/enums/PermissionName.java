@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum PermissionName {
     USER_READ("user:read"),
     USER_CREATE("user:create"),
@@ -16,6 +16,7 @@ public enum PermissionName {
     PERMISSION_UPDATE("permission:update"),
     PERMISSION_DELETE("permission:delete");
     String value;
+
     PermissionName(String value) {
         this.value = value;
     }

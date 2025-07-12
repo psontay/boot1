@@ -1,12 +1,12 @@
 package com.boot1.dto.response;
 
-import com.boot1.Entities.Role;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.boot1.Entities.Role;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @AllArgsConstructor

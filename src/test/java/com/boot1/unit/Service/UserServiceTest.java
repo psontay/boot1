@@ -1,16 +1,13 @@
 package com.boot1.unit.Service;
 
-import com.boot1.Entities.Role;
-import com.boot1.Entities.User;
-import com.boot1.dto.request.UserCreationRequest;
-import com.boot1.dto.request.UserUpdateRequest;
-import com.boot1.dto.response.UserResponse;
-import com.boot1.enums.RoleName;
-import com.boot1.exception.ApiException;
-import com.boot1.mapper.UserMapper;
-import com.boot1.repository.RoleRepository;
-import com.boot1.repository.UserRepository;
-import com.boot1.service.UserService;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,26 +21,36 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.boot1.Entities.Role;
+import com.boot1.Entities.User;
+import com.boot1.dto.request.UserCreationRequest;
+import com.boot1.dto.request.UserUpdateRequest;
+import com.boot1.dto.response.UserResponse;
+import com.boot1.enums.RoleName;
+import com.boot1.exception.ApiException;
+import com.boot1.mapper.UserMapper;
+import com.boot1.repository.RoleRepository;
+import com.boot1.repository.UserRepository;
+import com.boot1.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource("/test.properties")
 public class UserServiceTest {
     @InjectMocks
     UserService userService;
+
     @Mock
     UserMapper userMapper;
+
     @Mock
     UserRepository userRepository;
+
     @Mock
     PasswordEncoder passwordEncoder;
+
     @Mock
     RoleRepository roleRepository;
+
     LocalDate dob;
     UserCreationRequest userCreationRequest;
     UserResponse userResponse;
@@ -51,28 +58,28 @@ public class UserServiceTest {
     UserUpdateRequest userUpdateRequest;
     Role userRole;
     Role adminRole;
+
     @BeforeEach
     void initData() {
-        userRole = Role.builder()
-                   .name(RoleName.USER.name())
-                   .build();
+        userRole = Role.builder().name(RoleName.USER.name()).build();
         adminRole = Role.builder().name(RoleName.ADMIN.name()).build();
-        dob = LocalDate.of(2005 , 1 , 1);
+        dob = LocalDate.of(2005, 1, 1);
         userCreationRequest = UserCreationRequest.builder()
-                                                 .username("Test")
-                                                 .firstName("test")
-                                                 .lastName("test")
-                                                 .email("user@test@gmail.com")
-                                                 .password("Testtest")
-                                                 .dob(dob).build();
+                .username("Test")
+                .firstName("test")
+                .lastName("test")
+                .email("user@test@gmail.com")
+                .password("Testtest")
+                .dob(dob)
+                .build();
         userResponse = UserResponse.builder()
-                                   .username("Test")
-                                   .dob(dob)
-                                   .firstName("test")
-                                   .lastName("test")
-                                    .roles(Set.of(adminRole))
-                                   .id("sontaypham")
-                                   .build();
+                .username("Test")
+                .dob(dob)
+                .firstName("test")
+                .lastName("test")
+                .roles(Set.of(adminRole))
+                .id("sontaypham")
+                .build();
         user = User.builder()
                 .username("Test")
                 .firstName("test")
@@ -80,16 +87,19 @@ public class UserServiceTest {
                 .id("sontaypham")
                 .email("user@test@gmail.com")
                 .password("Testtest")
-                .dob(dob).build();
+                .dob(dob)
+                .build();
 
         userUpdateRequest = UserUpdateRequest.builder()
-                   .firstName("test")
-                   .lastName("test")
-                   .email("user@testupdate@gmail.com")
-                   .password("Testtest")
+                .firstName("test")
+                .lastName("test")
+                .email("user@testupdate@gmail.com")
+                .password("Testtest")
                 .roles(Set.of("ADMIN"))
-                   .dob(dob).build();
+                .dob(dob)
+                .build();
     }
+
     @Test
     void createUser_validRequest_success() {
         // given
@@ -102,8 +112,9 @@ public class UserServiceTest {
         // when
         UserResponse userResponse = userService.createUser(userCreationRequest);
         // then
-        assertEquals("Test" , userResponse.getUsername());
+        assertEquals("Test", userResponse.getUsername());
     }
+
     @Test
     void createUser_usernameExists_fail() {
         // given
@@ -112,6 +123,7 @@ public class UserServiceTest {
         ApiException exception = assertThrows(ApiException.class, () -> userService.createUser(userCreationRequest));
         assertEquals("Username already exists", exception.getMessage());
     }
+
     @Test
     void createUser_roleNotFound_fail() {
         // given
@@ -122,6 +134,7 @@ public class UserServiceTest {
         ApiException exception = assertThrows(ApiException.class, () -> userService.createUser(userCreationRequest));
         assertEquals("Role not found", exception.getMessage());
     }
+
     @Test
     void getMyProfile_valid_success() {
         // given
@@ -135,6 +148,7 @@ public class UserServiceTest {
         Assertions.assertThat(response.getUsername()).isEqualTo("Test");
         Assertions.assertThat(response.getId()).isEqualTo("sontaypham");
     }
+
     @Test
     void getMyI4_invalidRequest_fail() {
         // given
@@ -146,37 +160,34 @@ public class UserServiceTest {
         // then
         Assertions.assertThat(exception.getMessage()).isEqualTo("User not exists");
     }
+
     @Test
     void updateUser_valid_success() {
         // given
         userUpdateRequest.setPassword("newPassword");
         userUpdateRequest.setRoles(Set.of("ADMIN"));
 
-        when(userRepository.findById("sontaypham"))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findById("sontaypham")).thenReturn(Optional.of(user));
 
         doAnswer(invocation -> {
-            User u = invocation.getArgument(0);
-            UserUpdateRequest r = invocation.getArgument(1);
-            return null;
-        }).when(userMapper)
-          .updateUser(any(User.class), any(UserUpdateRequest.class));
-
-        when(passwordEncoder.encode("newPassword"))
-                .thenReturn("encodedPass");
-
-        when(roleRepository.findByNameIn(Set.of("ADMIN")))
-                .thenReturn(Set.of(adminRole));
-
-        when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> {
                     User u = invocation.getArgument(0);
-                    u.setId("sontaypham");
-                    u.setRoles(Set.of(adminRole));
-                    return u;
-                });
-        when(userMapper.toUserResponse(any(User.class)))
-                .thenReturn(userResponse);
+                    UserUpdateRequest r = invocation.getArgument(1);
+                    return null;
+                })
+                .when(userMapper)
+                .updateUser(any(User.class), any(UserUpdateRequest.class));
+
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedPass");
+
+        when(roleRepository.findByNameIn(Set.of("ADMIN"))).thenReturn(Set.of(adminRole));
+
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            u.setId("sontaypham");
+            u.setRoles(Set.of(adminRole));
+            return u;
+        });
+        when(userMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
         // when
         UserResponse updated = userService.updateUser("sontaypham", userUpdateRequest);
 
@@ -191,25 +202,22 @@ public class UserServiceTest {
         assertEquals("sontaypham", updated.getId());
         assertTrue(updated.getRoles().stream().anyMatch(r -> r.getName().equals("ADMIN")));
     }
+
     @Test
     void updateUser_passwordNull_rolesValid_success() {
         // given
         userUpdateRequest.setPassword(null);
         userUpdateRequest.setRoles(Set.of("ADMIN"));
 
-        when(userRepository.findById("sontaypham"))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findById("sontaypham")).thenReturn(Optional.of(user));
 
         doNothing().when(userMapper).updateUser(any(User.class), any(UserUpdateRequest.class));
 
-        when(roleRepository.findByNameIn(Set.of("ADMIN")))
-                .thenReturn(Set.of(adminRole));
+        when(roleRepository.findByNameIn(Set.of("ADMIN"))).thenReturn(Set.of(adminRole));
 
-        when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(userMapper.toUserResponse(any(User.class)))
-                .thenReturn(userResponse);
+        when(userMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
 
         // when
         UserResponse updated = userService.updateUser("sontaypham", userUpdateRequest);
@@ -219,25 +227,22 @@ public class UserServiceTest {
         verify(userRepository).save(any(User.class));
         assertEquals("sontaypham", updated.getId());
     }
+
     @Test
     void updateUser_passwordBlank_rolesValid_success() {
         // given
         userUpdateRequest.setPassword("");
         userUpdateRequest.setRoles(Set.of("ADMIN"));
 
-        when(userRepository.findById("sontaypham"))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findById("sontaypham")).thenReturn(Optional.of(user));
 
         doNothing().when(userMapper).updateUser(any(User.class), any(UserUpdateRequest.class));
 
-        when(roleRepository.findByNameIn(Set.of("ADMIN")))
-                .thenReturn(Set.of(adminRole));
+        when(roleRepository.findByNameIn(Set.of("ADMIN"))).thenReturn(Set.of(adminRole));
 
-        when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(userMapper.toUserResponse(any(User.class)))
-                .thenReturn(userResponse);
+        when(userMapper.toUserResponse(any(User.class))).thenReturn(userResponse);
 
         // when
         UserResponse updated = userService.updateUser("sontaypham", userUpdateRequest);
@@ -247,7 +252,6 @@ public class UserServiceTest {
         verify(userRepository).save(any(User.class));
         assertEquals("sontaypham", updated.getId());
     }
-
 
     @Test
     void getUsers_validRequest_success() {
@@ -258,8 +262,7 @@ public class UserServiceTest {
         // when
         var response = userService.getUsers();
         // then
-        assertEquals("Test" , response.getFirst().getUsername());
-        assertEquals(1 , response.size());
+        assertEquals("Test", response.getFirst().getUsername());
+        assertEquals(1, response.size());
     }
-
 }

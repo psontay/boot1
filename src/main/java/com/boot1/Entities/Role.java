@@ -1,10 +1,11 @@
 package com.boot1.Entities;
 
+import java.util.Set;
+
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -15,14 +16,15 @@ import java.util.Set;
 public class Role {
     @Id
     String name;
+
     String description;
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @ManyToMany
     @JoinTable(
             name = "role_permissions",
             joinColumns = @JoinColumn(name = "role_name"),
-            inverseJoinColumns = @JoinColumn(name = "permission_name")
-    )
+            inverseJoinColumns = @JoinColumn(name = "permission_name"))
     Set<Permission> permissions;
 }

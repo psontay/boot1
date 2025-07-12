@@ -1,5 +1,7 @@
 package com.boot1.configuration;
 
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,42 +18,44 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINTS = { "/users/create" , "/auth/login" , "/auth/introspect" ,
-            "/auth/logout" , "/auth/refresh"};
+    private final String[] PUBLIC_ENDPOINTS = {
+        "/users/create", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh"
+    };
+
     @Value("${spring.jwt.signerKey}")
     private String signerKey;
+
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
+
     @Bean
     public SecurityFilterChain filterChainer(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(authorizeRequests ->
-                                                   authorizeRequests
-                                                           .requestMatchers(HttpMethod.POST , PUBLIC_ENDPOINTS).permitAll()
-                                                           .anyRequest().authenticated());
-        httpSecurity.oauth2ResourceServer( config ->
-                                         config.jwt( jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
-                                                 .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                                                 .authenticationEntryPoint( new JWTAuthenticationEntryPoint())
-                                                 .accessDeniedHandler(new CustomAccessDeniedHandler())
-                                         );
+        httpSecurity.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
+                .anyRequest()
+                .authenticated());
+        httpSecurity.oauth2ResourceServer(config -> config.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customJwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JWTAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter( );
-        converter.setJwtGrantedAuthoritiesConverter( jwt -> {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             Collection<GrantedAuthority> auths = new ArrayList<>();
             jwt.getClaimAsStringList("scope").stream()
-                    .map( r -> "ROLE_" + r)
+                    .map(r -> "ROLE_" + r)
                     .map(SimpleGrantedAuthority::new)
                     .forEach(auths::add);
             jwt.getClaimAsStringList("permission").stream()
@@ -61,6 +65,7 @@ public class SecurityConfig {
         });
         return converter;
     }
+
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
