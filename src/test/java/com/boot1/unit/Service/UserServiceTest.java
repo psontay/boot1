@@ -49,9 +49,14 @@ public class UserServiceTest {
     UserResponse userResponse;
     User user;
     UserUpdateRequest userUpdateRequest;
-    Role role;
+    Role userRole;
+    Role adminRole;
     @BeforeEach
     void initData() {
+        userRole = Role.builder()
+                   .name(RoleName.USER.name())
+                   .build();
+        adminRole = Role.builder().name(RoleName.ADMIN.name()).build();
         dob = LocalDate.of(2005 , 1 , 1);
         userCreationRequest = UserCreationRequest.builder()
                                                  .username("Test")
@@ -65,23 +70,24 @@ public class UserServiceTest {
                                    .dob(dob)
                                    .firstName("test")
                                    .lastName("test")
+                                    .roles(Set.of(adminRole))
                                    .id("sontaypham")
                                    .build();
         user = User.builder()
                 .username("Test")
                 .firstName("test")
                 .lastName("test")
+                .id("sontaypham")
                 .email("user@test@gmail.com")
                 .password("Testtest")
                 .dob(dob).build();
-        role = Role.builder()
-                   .name(RoleName.USER.name())
-                   .build();
+
         userUpdateRequest = UserUpdateRequest.builder()
                    .firstName("test")
                    .lastName("test")
                    .email("user@testupdate@gmail.com")
                    .password("Testtest")
+                .roles(Set.of("ADMIN"))
                    .dob(dob).build();
     }
     @Test
@@ -90,7 +96,7 @@ public class UserServiceTest {
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userMapper.toUser(userCreationRequest)).thenReturn(user);
         when(passwordEncoder.encode(anyString())).thenReturn("Testtest");
-        when(roleRepository.findByName("USER")).thenReturn(Optional.of(role));
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         // when
@@ -145,7 +151,6 @@ public class UserServiceTest {
         // given
         userUpdateRequest.setPassword("newPassword");
         userUpdateRequest.setRoles(Set.of("ADMIN"));
-        Role adminRole = Role.builder().name("ADMIN").build();
 
         when(userRepository.findById("sontaypham"))
                 .thenReturn(Optional.of(user));
@@ -164,8 +169,14 @@ public class UserServiceTest {
                 .thenReturn(Set.of(adminRole));
 
         when(userRepository.save(any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
+                .thenAnswer(invocation -> {
+                    User u = invocation.getArgument(0);
+                    u.setId("sontaypham");
+                    u.setRoles(Set.of(adminRole));
+                    return u;
+                });
+        when(userMapper.toUserResponse(any(User.class)))
+                .thenReturn(userResponse);
         // when
         UserResponse updated = userService.updateUser("sontaypham", userUpdateRequest);
 
@@ -177,15 +188,71 @@ public class UserServiceTest {
         assertEquals("encodedPass", saved.getPassword());
         assertTrue(saved.getRoles().contains(adminRole));
 
-        assertEquals("sontaypham", updated.getUsername());
-        assertTrue(updated.getRoles().contains("ADMIN"));
+        assertEquals("sontaypham", updated.getId());
+        assertTrue(updated.getRoles().stream().anyMatch(r -> r.getName().equals("ADMIN")));
     }
+    @Test
+    void updateUser_passwordNull_rolesValid_success() {
+        // given
+        userUpdateRequest.setPassword(null);
+        userUpdateRequest.setRoles(Set.of("ADMIN"));
+
+        when(userRepository.findById("sontaypham"))
+                .thenReturn(Optional.of(user));
+
+        doNothing().when(userMapper).updateUser(any(User.class), any(UserUpdateRequest.class));
+
+        when(roleRepository.findByNameIn(Set.of("ADMIN")))
+                .thenReturn(Set.of(adminRole));
+
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(userMapper.toUserResponse(any(User.class)))
+                .thenReturn(userResponse);
+
+        // when
+        UserResponse updated = userService.updateUser("sontaypham", userUpdateRequest);
+
+        // then
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(userRepository).save(any(User.class));
+        assertEquals("sontaypham", updated.getId());
+    }
+    @Test
+    void updateUser_passwordBlank_rolesValid_success() {
+        // given
+        userUpdateRequest.setPassword("");
+        userUpdateRequest.setRoles(Set.of("ADMIN"));
+
+        when(userRepository.findById("sontaypham"))
+                .thenReturn(Optional.of(user));
+
+        doNothing().when(userMapper).updateUser(any(User.class), any(UserUpdateRequest.class));
+
+        when(roleRepository.findByNameIn(Set.of("ADMIN")))
+                .thenReturn(Set.of(adminRole));
+
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(userMapper.toUserResponse(any(User.class)))
+                .thenReturn(userResponse);
+
+        // when
+        UserResponse updated = userService.updateUser("sontaypham", userUpdateRequest);
+
+        // then
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(userRepository).save(any(User.class));
+        assertEquals("sontaypham", updated.getId());
+    }
+
 
     @Test
     void getUsers_validRequest_success() {
         // given
-        role = Role.builder().name(RoleName.ADMIN.name()).build();
-        user.setRoles(Set.of(role));
+        user.setRoles(Set.of(adminRole));
         when(userRepository.findAll()).thenReturn(List.of(user));
         when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         // when

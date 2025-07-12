@@ -8,6 +8,7 @@ import com.boot1.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -68,29 +69,49 @@ public class UserController {
     }
 
     @GetMapping("/findByFirstName/{firstName}")
-    public ApiResponse<List<UserResponse>> findByFirstName(@PathVariable String firstName) {
-        return ApiResponse.<List<UserResponse>>builder()
-                          .code(1)
-                          .result(userService.findByFirstName(firstName))
-                          .build();
+    public ResponseEntity<ApiResponse<List<UserResponse>>> findByFirstName(
+            @PathVariable String firstName) {
+
+        List<UserResponse> result = userService.findByFirstName(firstName);
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(
+                ApiResponse.<List<UserResponse>>builder()
+                           .code(1)
+                           .result(result)
+                           .build()
+                                );
     }
 
-    @GetMapping("/findByFirstAndLastName")
-    public ApiResponse<List<UserResponse>> findByFirstAndLastName(
-            @RequestParam String firstName,
-            @RequestParam String lastName) {
-        return ApiResponse.<List<UserResponse>>builder()
+    @GetMapping("/findByFirstAndLastName/{firstName}/{lastName}")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> findByFirstAndLastName(
+            @PathVariable String firstName,
+            @PathVariable String lastName) {
+        List<UserResponse> result = userService.findByFirstAndLastName(firstName, lastName);
+        if ( result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(
+                ApiResponse.<List<UserResponse>>builder()
                           .code(1)
-                          .result(userService.findByFirstAndLastName(firstName, lastName))
-                          .build();
+                          .result(result)
+                          .build()
+                                );
     }
 
     @GetMapping("/findByLastName/{lastName}")
-    public ApiResponse<List<UserResponse>> findByLastName(@PathVariable String lastName) {
-        return ApiResponse.<List<UserResponse>>builder()
+    public ResponseEntity<ApiResponse<List<UserResponse>>> findByLastName(@PathVariable String lastName) {
+        List<UserResponse> result = userService.findByLastName(lastName);
+        if ( result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(
+                ApiResponse.<List<UserResponse>>builder()
                           .code(1)
-                          .result(userService.findByLastName(lastName))
-                          .build();
+                          .result(result)
+                          .build()
+                                );
     }
 
     @PutMapping("/update/{id}")

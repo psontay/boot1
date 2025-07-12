@@ -115,8 +115,8 @@ public class UserService {
         }
         userMapper.updateUser(user, request);
         user.setRoles(roleRepository.findByNameIn(request.getRoles()));
-        userRepository.save(user);
-        return userMapper.toUserResponse(user);
+        User ans = userRepository.save(user);
+        return userMapper.toUserResponse(ans);
     }
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public void deleteUser(String id) {

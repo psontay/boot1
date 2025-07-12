@@ -151,7 +151,6 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-
                     <!-- Coverage cho integration test -->
                     <execution>
                         <id>prepare-agent-integration</id>
@@ -196,8 +195,16 @@
                             <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
                         </configuration>
                     </execution>
-
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>com/boot1/dto/**</exclude>
+                        <exclude>com/boot1/Entities/**</exclude>
+                        <exclude>com/boot1/enums/**</exclude>
+                        <exclude>com/boot1/mapper/**</exclude>
+                        <exclude>com/boot1/configuration/**</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
             <!-- Plugin Failsafe để chạy integration test -->

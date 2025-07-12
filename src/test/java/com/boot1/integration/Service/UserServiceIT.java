@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -126,7 +126,7 @@ class UserServiceIT {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("sontaypham", result.get(0).getId());
+        assertEquals("sontaypham", result.getFirst().getId());
     }
 
     @Test
@@ -158,7 +158,7 @@ class UserServiceIT {
         when(userRepository.findById("sontaypham")).thenReturn(Optional.empty());
         when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         // when then
-        mockMvc.perform(get("/users/findById/sontaypham")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/users/findById/sontaypham")).andExpect(status().isNotFound());
     }
     @Test
     @WithMockUser( roles = "ADMIN")
@@ -190,5 +190,63 @@ class UserServiceIT {
         when(userRepository.findByEmail("test")).thenReturn(Optional.empty());
         //when then
         mockMvc.perform(get("/users/findByEmail/test")).andExpect(status().isNotFound());
+    }
+    @Test
+    @WithMockUser ( username = "Test" , roles = "ADMIN")
+    void findByFirstName_validRequest_success() throws Exception {
+        // given
+        when(userRepository.findByFirstNameContaining("test")).thenReturn(List.of(user));
+        // when then
+        mockMvc.perform(get("/users/findByFirstName/test")).andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser( username = "Test" , roles = "ADMIN")
+    void findByFirstName_usernameNotFound_fail() throws Exception {
+        // given
+        when(userRepository.findByFirstNameContaining("z")).thenReturn(List.of());
+        // when then
+        mockMvc.perform(get("/users/findByFirstName/z")).andExpect(status().isNotFound());
+    }
+    @Test
+    @WithMockUser( username = "Test" , roles = "ADMIN")
+    void findByFirstAndLastName_validRequest_success() throws Exception {
+        // given
+        when(userRepository.findByFirstNameAndLastName("test" , "test")).thenReturn(List.of(user));
+        // when then
+        mockMvc.perform(get("/users/findByFirstAndLastName/test/test")).andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser( username = "Test" , roles = "ADMIN")
+    void findByFirstAndLastName_notFound_fail() throws Exception {
+        // given
+        when(userRepository.findByFirstNameAndLastName("z" , "z")).thenReturn(List.of());
+        // when then
+        mockMvc.perform(get("/users/findByFirstAndLastName/z/z")).andExpect(status().isNotFound());
+    }
+    @Test
+    @WithMockUser ( username = "Test" , roles = "ADMIN")
+    void findByLastName_validRequest_success() throws Exception {
+        // given
+        when(userRepository.findByLastNameContaining("test")).thenReturn(List.of(user));
+        // when then
+        mockMvc.perform(get("/users/findByLastName/test")).andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser( username = "Test" , roles = "ADMIN")
+    void findByLastName_usernameNotFound_fail() throws Exception {
+        // given
+        when(userRepository.findByLastNameContaining("z")).thenReturn(List.of());
+        // when then
+        mockMvc.perform(get("/users/findByLastName/z")).andExpect(status().isNotFound());
+    }
+    @Test
+    @WithMockUser( username = "Test" , roles = "ADMIN")
+    void deleteUser_asAdminRole_success() throws Exception {
+        // given
+        String userIdToDelete = "anyId";
+        // when
+        userService.deleteUser(userIdToDelete);
+        // then
+        verify(userRepository, times(1)).deleteById(userIdToDelete);
     }
 }
