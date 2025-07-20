@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.boot1.Entities.Permission;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -27,10 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApplicationInitConfig {
-    PasswordEncoder passwordEncoder;
-
+    private final PasswordEncoder passwordEncoder;
+    @Value("${spring.app.default-admin.username}")
+    String username;
+    @Value("${spring.app.default-admin.password}")
+    String password;
     @Bean
     @ConditionalOnProperty(
             prefix = "spring.datasource",
@@ -58,14 +62,14 @@ public class ApplicationInitConfig {
                     roleRepository.save(new Role(RoleName.ADMIN.name(), "ADMIN with all permissions", permissions));
                 }
 
-                if(userRepository.findByUsername("admin").isEmpty()) {
+                if(userRepository.findByUsername(username).isEmpty()) {
                     Role adminRole = roleRepository
                             .findByName(RoleName.ADMIN.name())
                             .orElseThrow(() -> new ApiException(ErrorCode.ROLE_NOT_FOUND));
 
                     User user = User.builder()
-                                    .username("admin")
-                                    .password(passwordEncoder.encode("admin"))
+                                    .username(username)
+                                    .password(passwordEncoder.encode(password))
                                     .roles(Set.of(adminRole))
                                     .build();
                     userRepository.save(user);
