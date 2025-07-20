@@ -266,7 +266,7 @@ class UserServiceIT {
 
     @Test
     @WithMockUser(username = "Test", roles = "ADMIN")
-    void deleteUser_asAdminRole_success() throws Exception {
+    void deleteUser_asAdminRole_success()  {
         // given
         String userIdToDelete = "anyId";
         // when

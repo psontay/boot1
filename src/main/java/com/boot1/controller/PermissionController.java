@@ -86,7 +86,7 @@ public class PermissionController {
 
     @Transactional
     @DeleteMapping("delete/{name}")
-    ApiResponse<String> deletePermissionByName(@PathVariable String name) {
+    public ApiResponse<String> deletePermissionByName(@PathVariable String name) {
         permissionService.deletePermissionByName(name);
         return ApiResponse.<String>builder()
                 .code(1)

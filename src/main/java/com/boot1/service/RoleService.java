@@ -35,7 +35,7 @@ public class RoleService {
     RoleMapper roleMapper;
     PermissionRepository permissionRepository;
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public RoleResponse create(RoleRequest roleRequest) {
         log.info("<Create Role Method> {}", roleRequest.getName());
         if (roleRepository.existsByName(roleRequest.getName())) {
