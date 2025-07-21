@@ -27,7 +27,7 @@ public class SecurityConfig {
         "/users/create", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh" , "roles/create"
     };
 
-    @Value("${spring.jwt.signerKey}")
+    @Value("${jwt.signerKey}")
     private String signerKey;
 
     @Autowired

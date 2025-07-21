@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -51,7 +52,12 @@ public class UserService {
         Set<com.boot1.Entities.Role> roles = new HashSet<>();
         roles.add(role);
         user.setRoles(roles);
-        userRepository.save(user);
+        try {
+            user =userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            log.error(e.getMessage());
+            throw new ApiException(ErrorCode.USER_EXISTS);
+        }
         return userMapper.toUserResponse(user);
     }
 

@@ -19,7 +19,7 @@ import com.nimbusds.jose.JOSEException;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${spring.jwt.signerKey}")
+    @Value("${jwt.signerKey}")
     private String signerKey;
 
     @Autowired

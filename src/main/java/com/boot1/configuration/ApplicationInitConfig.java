@@ -31,9 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApplicationInitConfig {
     private final PasswordEncoder passwordEncoder;
-    @Value("${spring.app.default-admin.username}")
+    @Value("${app.default-admin.username}")
     String username;
-    @Value("${spring.app.default-admin.password}")
+    @Value("${app.default-admin.password}")
     String password;
     @Bean
     @ConditionalOnProperty(

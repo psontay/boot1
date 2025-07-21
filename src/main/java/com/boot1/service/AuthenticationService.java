@@ -46,23 +46,23 @@ public class AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
-    @Value("${spring.jwt.signerKey}")
-    protected String SIGNER_KEY;
+    @Value("${jwt.signerKey}")
+    protected String signerKey;
 
     @NonFinal
-    @Value("${spring.jwt.valid-duration}")
-    protected long VALID_DURATION;
+    @Value("${jwt.valid-duration}")
+    protected long validDuration;
 
     @NonFinal
-    @Value("${spring.jwt.refreshable-duration}")
-    protected long REFRESHABLE_DURATION;
+    @Value("${jwt.refreshable-duration}")
+    protected long refreshableDuration;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository
                 .findByUsername((request.getUsername()))
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
         log.info("User Roles: " + user.getRoles());
-
+        log.info("SignerKey Authenticate : " + signerKey);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -81,7 +81,7 @@ public class AuthenticationService {
                 .issuer("sontaypham")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                        Instant.now().plus(refreshableDuration, ChronoUnit.SECONDS).toEpochMilli()))
                 .claim("scope", buildScope(user))
                 .claim("permission", buildPermissions(user))
                 .jwtID(UUID.randomUUID().toString())
@@ -89,7 +89,7 @@ public class AuthenticationService {
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY));
+            jwsObject.sign(new MACSigner(signerKey));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             throw new RuntimeException(e);
@@ -141,14 +141,14 @@ public class AuthenticationService {
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes()); // create verifier to get signer_key
+        JWSVerifier verifier = new MACVerifier(signerKey.getBytes()); // create verifier to get signer_key
         SignedJWT signedJWT = SignedJWT.parse(token); // parse request token
         Date expTime = (isRefresh) // calculator expiration time for refresh token
                 ? new Date(signedJWT
                         .getJWTClaimsSet()
                         .getIssueTime()
                         .toInstant()
-                        .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
+                        .plus(refreshableDuration, ChronoUnit.SECONDS)
                         .toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime(); // or use expiration time of access token
         var verified = signedJWT.verify(verifier); // verify signer_key
