@@ -167,8 +167,7 @@ public class AuthenticationService {
                 InvalidatedToken.builder().id(jti).expTime(expTime).build();
         invalidatedTokenRepository.save(invalidatedToken);
         var username = signJWT.getJWTClaimsSet().getSubject();
-        var user =
-                userRepository.findByUsername(username).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXISTS));
         var refreshToken = generateToken(user);
         return RefreshResponse.builder().token(refreshToken).success(true).build();
     }

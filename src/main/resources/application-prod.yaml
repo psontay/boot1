@@ -1,5 +1,4 @@
 jwt:
-  signerKey: "tROJF2gMEjMrlQmO2FqUWZc1Aj75dTZACeqA7uOtzJ82NEIMEVd4HNMj02orBqhM"
   valid-duration: 7200 #seccon
   refreshable-duration: 72000 #second
 
